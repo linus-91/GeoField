@@ -1,0 +1,1984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Field data portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Field">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--paper:#F4F6F1;--card:#fff;--ink:#17231E;--muted:#6B7872;--line:#E3E8E1;--fill:#EFF2EC;--accent:#D9480F;--ok:#2E7D4F;--warn:#B7791F;--bad:#B3261E;
+ --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);
+ --shadow:0 1px 2px rgba(23,35,30,.05),0 6px 20px rgba(23,35,30,.05)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--paper);overscroll-behavior:none}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:16px;line-height:1.4;color:var(--ink);-webkit-text-size-adjust:100%}
+#gfp{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--paper);max-width:760px;margin:0 auto}
+h1,h2,h3,p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit;margin:0;max-width:100%}
+button{cursor:pointer;touch-action:manipulation}
+.hdr{flex:0 0 auto;background:#fff;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:calc(8px + var(--sat)) calc(14px + var(--sar)) 8px calc(14px + var(--sal))}
+.hl{flex:1;min-width:0}.lab{font-size:11px;color:var(--muted)}.proj{font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stn{background:var(--ink);color:#fff;border:0;border-radius:999px;padding:7px 14px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:15px;min-height:38px}
+.hr{display:flex;align-items:center;gap:8px}
+.gps{background:var(--fill);border:0;border-radius:999px;padding:6px 11px;font-size:13px;display:flex;gap:6px;align-items:center;min-height:36px}
+.live{background:var(--ok);color:#fff;border-radius:8px;padding:0 5px;font-size:11px}
+.dot{width:9px;height:9px;border-radius:50%;background:#B5BEB8;display:inline-block}
+.dot.ok{background:#3FA567}.dot.warn{background:#E0A63A}.dot.bad{background:#E5534B}
+.main{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:20px}
+.tabbar{flex:0 0 auto;display:flex;background:#fff;border-top:1px solid var(--line);padding-bottom:var(--sab)}
+.tabbar button{flex:1;border:0;background:transparent;padding:8px 0 6px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;min-height:54px}
+.tabbar .ic svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;display:block}
+.tabbar button[aria-selected=true]{color:var(--ink);font-weight:700}
+.tabbar button[aria-selected=true] .ic{color:var(--accent)}
+.pane{padding:14px calc(14px + var(--sar)) 14px calc(14px + var(--sal))}
+.card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card h2{font-size:20px;margin-bottom:2px;letter-spacing:-.01em}
+.hint{font-size:13px;color:var(--muted);margin-bottom:10px}
+.f{margin:0 0 16px}
+.f>label,.lbl{display:block;font-weight:600;font-size:13px;color:var(--muted);margin-bottom:6px}
+input[type=text],input[type=number],input[type=date],input[type=url],input[type=search],select,textarea{width:100%;border:1.5px solid transparent;border-radius:12px;padding:11px 12px;background:var(--fill);min-height:48px;font-size:16px}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--ink);background:#fff}
+button:focus-visible{outline:3px solid #F4A261;outline-offset:1px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1 1 130px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:9px 15px;min-height:42px;font-size:15px}
+.chip[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.chip.plus{border-style:dashed;color:var(--muted)}
+.pickbtn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;border:1.5px solid transparent;background:var(--fill);border-radius:12px;padding:11px 12px;min-height:48px;font-size:16px}
+.pickbtn.empty .pv{color:#8B9791}.pickbtn .caret{color:var(--muted)}
+.clr{background:transparent;border:0;color:var(--muted);font-size:13px;padding:6px 2px;text-decoration:underline}.clr.bad{color:var(--bad)}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media(max-width:380px){.checks{grid-template-columns:1fr}}
+.chk{display:flex;align-items:center;gap:9px;background:var(--fill);border-radius:12px;padding:10px 11px;min-height:46px;font-size:14.5px;line-height:1.25;cursor:pointer}
+.chk input{width:20px;height:20px;flex:0 0 auto;accent-color:var(--ink);margin:0}
+.chk.on{background:#E5EEE8;font-weight:600}
+.btn{border:1.5px solid var(--ink);background:#fff;border-radius:14px;padding:11px 15px;min-height:48px;font-weight:600}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}.btn.dark{background:var(--ink);color:#fff}
+.btn.sm{min-height:38px;padding:7px 12px;font-size:14px;border-radius:11px}.btn.danger{border-color:var(--bad);color:var(--bad)}
+.btn:disabled{opacity:.4}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.bar>.btn{flex:1 1 150px}
+.bar.sticky>.btn{font-size:15px;padding:10px 8px}
+.bar.sticky{position:sticky;bottom:0;background:linear-gradient(to top,#fff 80%,rgba(255,255,255,0));padding:14px 0 2px;margin-top:8px;z-index:3}
+.tool{background:var(--fill);border-radius:12px;padding:8px;margin-top:8px}
+.num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.read{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:40px;font-weight:700;line-height:1.05}
+.stationbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.bigcode{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:30px;font-weight:700;line-height:1.05;letter-spacing:-.02em}
+.bigcode.small{font-size:22px}
+.stationbar .bar{flex-wrap:nowrap}.stationbar .bar>.btn{flex:1 1 auto;min-width:0;padding:7px 11px}
+.stepper{display:flex;gap:4px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.stepper::-webkit-scrollbar{display:none}
+.step{flex:0 0 auto;display:flex;align-items:center;gap:7px;border:0;background:transparent;border-radius:999px;padding:8px 12px 8px 8px;font-size:14px;white-space:nowrap;min-height:40px;color:var(--muted)}
+.step .sn{width:22px;height:22px;border-radius:50%;background:#E3E8E1;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--ink)}
+.step.done .sn{background:var(--ok);color:#fff}
+.step.on{background:var(--ink);color:#fff}.step.on .sn{background:var(--accent);color:#fff}
+.step i{font-style:normal;font-size:11px;background:rgba(0,0,0,.12);border-radius:9px;padding:0 6px}
+.step.dim:not(.on){opacity:.4}.step:disabled{opacity:.35}
+.seg{display:flex;background:var(--fill);border-radius:14px;padding:4px;margin-bottom:12px}
+.seg button{flex:1;border:0;background:transparent;border-radius:11px;padding:10px 6px;font-weight:600;font-size:14px;color:var(--muted);display:flex;gap:6px;justify-content:center;align-items:center}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.seg i{font-style:normal;font-size:11px;background:var(--ink);color:#fff;border-radius:9px;padding:0 6px}
+.sech{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin:18px 0 10px;padding-top:12px;border-top:1px solid var(--line)}
+.sech.lone{border-top:0;margin:6px 0 8px;padding-top:0}
+.codechip{display:flex;gap:8px;align-items:baseline;background:var(--fill);border-radius:12px;padding:9px 12px;margin-bottom:14px;font-size:13px;color:var(--muted)}
+.codechip b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:17px;color:var(--ink)}
+.f.off{opacity:.38;margin-bottom:10px;pointer-events:none}.f.off label{margin:0 0 2px}.offtxt{font-size:12px;color:var(--muted)}
+.offnote{background:var(--fill);border-radius:12px;padding:14px;color:var(--muted);font-size:14px;margin-bottom:6px;opacity:.9}
+.dimnote{background:#FFF4E5;color:#8A5A12;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+.sec.off{opacity:.38;pointer-events:none}
+.ori .orow{display:flex;gap:8px}.ori .orow input{flex:1 1 0;min-width:0}.ori .measure{flex:0 0 auto;min-width:92px}
+.entries{margin-bottom:10px}
+.erow{display:flex;gap:8px;justify-content:space-between;align-items:flex-start;background:#fff;border-radius:14px;padding:11px 12px;margin-bottom:7px;box-shadow:var(--shadow)}
+.erow .em{flex:1;min-width:0}.erow .ec{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--muted)}.erow .et{font-size:14px}
+.erow .ea{display:flex;flex-direction:column;align-items:flex-end}
+.pitems,.sitems{margin-top:6px}
+.pitem{display:flex;gap:10px;background:var(--fill);border-radius:14px;padding:8px;margin-bottom:8px}
+.pitem img{width:84px;height:84px;object-fit:cover;border-radius:10px;flex:0 0 auto}
+.pitem .pbody{flex:1;min-width:0}.pitem textarea{min-height:56px;margin:4px 0;padding:8px 10px;font-size:14px;background:#fff}
+.pitem .lk{display:flex;gap:14px}
+.sitem{display:flex;gap:10px;justify-content:space-between;align-items:flex-start;background:var(--fill);border-radius:14px;padding:10px 12px;margin-bottom:8px}
+.modal{position:fixed;inset:0;background:rgba(12,20,16,.6);z-index:1000;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--paper);width:100%;max-width:640px;border-radius:22px 22px 0 0;padding:16px calc(16px + var(--sar)) calc(16px + var(--sab)) calc(16px + var(--sal));max-height:92%;overflow:auto}
+.sheet.tall{height:90%;display:flex;flex-direction:column}.sheet .scroll{flex:1;overflow-y:auto;margin:10px 0;-webkit-overflow-scrolling:touch}
+.sheet.cam{max-width:760px;padding:0;background:#000;color:#fff}
+.sheet h2{font-size:19px}.sh-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.plist{flex:1;overflow-y:auto;margin:8px 0;-webkit-overflow-scrolling:touch}
+.prow{width:100%;display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:0;border-bottom:1px solid var(--line);padding:13px 10px;min-height:52px;font-size:16px}
+.prow .tick{width:22px;color:var(--ok);font-weight:700}.prow .pn{flex:1}.prow .pc{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--muted);background:var(--fill);border-radius:7px;padding:2px 8px}
+.prow[aria-pressed=true]{background:#EAF3EC}.prow.add{color:var(--accent);font-weight:700}
+.addbox{background:#fff;border-radius:12px;padding:10px}.addbox summary{font-weight:600;padding:4px 0}.addbox input{margin:6px 0}
+video{width:100%;max-height:68vh;background:#000;display:block}
+.camov{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.6);color:#fff;font-family:ui-monospace,Consolas,monospace;font-size:12px;padding:4px 8px;border-radius:6px}
+.toast{position:fixed;left:50%;bottom:calc(76px + var(--sab));transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;z-index:2000;max-width:90vw;font-size:14px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.toast.bad{background:var(--bad)}
+.rec{background:#fff;border-radius:14px;margin-bottom:8px;box-shadow:var(--shadow)}
+.rec>button.head{width:100%;text-align:left;background:transparent;border:0;padding:13px;display:flex;gap:10px;align-items:baseline;min-height:50px}
+.rec>button.head b{font-family:ui-monospace,Menlo,Consolas,monospace}
+.rec .body{padding:0 13px 10px}.subrec{border-top:1px solid var(--line);padding:9px 0}
+.rec dl{margin:4px 0 6px;display:grid;grid-template-columns:120px 1fr;gap:3px 8px;font-size:13.5px}
+.rec dt{color:var(--muted)}.rec dd{margin:0;word-break:break-word}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.ph{background:#fff;border-radius:14px;overflow:hidden;font-size:12px;box-shadow:var(--shadow)}
+.ph img{width:100%;height:110px;object-fit:cover;display:block}.ph>div{padding:6px 8px;word-break:break-word}
+.dial{width:230px;height:230px;margin:6px auto;display:block}
+.warn{color:var(--warn);font-size:13px}
+.clist{margin:8px 0}.crow{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid var(--line);padding:9px 0}
+.crow .cn{flex:1 1 160px;min-width:0}.crow .cb{display:flex;gap:5px;flex-wrap:wrap}
+.pc{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--muted);background:var(--fill);border-radius:7px;padding:1px 7px;margin-left:6px}
+.mine{font-size:11px;color:#fff;background:var(--ink);border-radius:7px;padding:1px 7px;margin-left:6px}
+details.card summary{cursor:pointer}
+@media(prefers-reduced-motion:no-preference){.toast{animation:gfpIn .15s ease-out}}
+@keyframes gfpIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+</style>
+</head>
+<body>
+<div id="gfp"><noscript>This portal needs JavaScript.</noscript></div>
+<script>
+(function () {
+'use strict';
+var root = document.getElementById('gfp');
+
+/* ---------- helpers ---------- */
+function el(tag, attrs, kids) {
+  var n = document.createElement(tag);
+  if (attrs) Object.keys(attrs).forEach(function (k) {
+    if (k === 'class') n.className = attrs[k];
+    else if (k.slice(0, 2) === 'on') n[k] = attrs[k];
+    else if (attrs[k] !== undefined && attrs[k] !== null && attrs[k] !== false) n.setAttribute(k, attrs[k]);
+  });
+  [].concat(kids === undefined ? [] : kids).forEach(function (c) {
+    if (c === null || c === undefined || c === false) return;
+    n.appendChild(typeof c === 'object' ? c : document.createTextNode(String(c)));
+  });
+  return n;
+}
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+function today() { var d = new Date(); return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function nowStr() { var d = new Date(); return today() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+function norm360(x) { return ((x % 360) + 360) % 360; }
+function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+function toast(msg, bad) {
+  var t = el('div', {class: 'toast' + (bad ? ' bad' : ''), role: 'status'}, msg);
+  document.body.appendChild(t); setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, bad ? 4500 : 2200);
+}
+function download(blob, name) {
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+function safeName(s) { return String(s || 'project').replace(/[^A-Za-z0-9_\-]+/g, '_'); }
+function ask(title, label, def, okText) {
+  return new Promise(function (res) {
+    var inp = el('input', {type: 'text', value: def || '', autocomplete: 'off'});
+    var close = function (v) { m.remove(); res(v); };
+    var m = el('div', {class: 'modal'}, el('div', {class: 'sheet'}, [el('h2', {}, title), el('div', {class: 'f'}, [el('label', {}, label), inp]),
+      el('div', {class: 'bar'}, [el('button', {type: 'button', class: 'btn pri', onclick: function () { close(inp.value.trim() || null); }}, okText || 'OK'),
+        el('button', {type: 'button', class: 'btn', onclick: function () { close(null); }}, 'Cancel')])]));
+    document.body.appendChild(m); setTimeout(function () { inp.focus(); inp.select(); }, 50);
+  });
+}
+
+/* ---------- state and storage ---------- */
+var LS = 'gfp2_settings', LC = 'gfp2_catalog';
+var S = {settings: {geologist: '', decl: 0, stamp: true, project: '', projects: [], flow: {}},
+  records: [], photos: [], tab: 'log', fix: null, watch: null, objUrls: {}, catalog: {}, extra: null, edit: null, stationFilter: 'station'};
+try { Object.assign(S.settings, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) {}
+function saveSettings() { try { localStorage.setItem(LS, JSON.stringify(S.settings)); } catch (e) {} }
+function saveCatalog() { try { localStorage.setItem(LC, JSON.stringify(S.catalog)); } catch (e) {} }
+
+var db = null;
+function openDB() {
+  return new Promise(function (res, rej) {
+    var rq = indexedDB.open('gfp2_db', 1);
+    rq.onupgradeneeded = function () {
+      var d = rq.result;
+      if (!d.objectStoreNames.contains('records')) d.createObjectStore('records', {keyPath: 'id'});
+      if (!d.objectStoreNames.contains('photos')) d.createObjectStore('photos', {keyPath: 'id'});
+    };
+    rq.onsuccess = function () { res(rq.result); }; rq.onerror = function () { rej(rq.error); };
+  });
+}
+function dbAll(store) { return new Promise(function (res, rej) { var rq = db.transaction(store).objectStore(store).getAll(); rq.onsuccess = function () { res(rq.result); }; rq.onerror = function () { rej(rq.error); }; }); }
+function dbPut(store, obj) { return new Promise(function (res, rej) { var tx = db.transaction(store, 'readwrite'); tx.objectStore(store).put(obj); tx.oncomplete = function () { res(); }; tx.onerror = function () { rej(tx.error); }; }); }
+function dbDel(store, id) { return new Promise(function (res, rej) { var tx = db.transaction(store, 'readwrite'); tx.objectStore(store).delete(id); tx.oncomplete = function () { res(); }; tx.onerror = function () { rej(tx.error); }; }); }
+
+/* ---------- catalog: every drop down list, editable ---------- */
+function L(pairs) { return pairs.map(function (p) { return typeof p === 'string' ? {n: p, c: ''} : {n: p[0], c: p[1] || ''}; }); }
+var CATALOG_META = {
+  rock: 'Rock type', unit: 'Unit or formation', colour: 'Colour', priority: 'Priority', younging: 'Younging direction', evidence: 'Younging evidence',
+  thickness: 'Bed thickness', grain: 'Grain size', fabric: 'Fabric', fabric_sub: 'Banded fabric type', extras: 'Extras in the bed', contact: 'Contact below',
+  structtype: 'Structure type', quality: 'Measurement quality', folform: 'Foliation form', closure: 'Fold closure', shape: 'Fold shape', tight: 'Fold tightness',
+  asym: 'Fold asymmetry', yesno: 'Yes or no', conf: 'Confidence', kind: 'Thrust, fault, shear zone, contact', seen: 'How well seen', faultrock: 'Fault rock',
+  style: 'Deformation style', rep: 'Repetition or omission', fabrics: 'Fabrics seen', phase: 'Deformation phase', indicators: 'Shear sense indicators',
+  index: 'Index minerals', mode: 'Mode of mineral', timing: 'Timing against foliation', texture: 'Metamorphic texture', retro: 'Retrogression',
+  side: 'Zone boundary side', deposit: 'Deposit type', control: 'Geological control', ore: 'Ore minerals', oxid: 'Oxidation products', gangue: 'Gangue minerals',
+  alt: 'Alteration', oretiming: 'Ore timing evidence', old: 'Old working', samplestaken: 'Samples taken at occurrence', isotype: 'Isotope sample type',
+  veingen: 'Vein generation', fabricrel: 'Relation to fabric', isoq: 'Isotope question', bodytype: 'Igneous body type', bodyform: 'Likely body form',
+  bodycontact: 'Igneous contact', intr: 'Intrusive evidence', tect: 'Tectonic evidence', internal: 'Internal features', deform: 'Deformation level',
+  bodysamples: 'Igneous samples', other: 'Other observation type', analyses: 'Analyses planned', objective: 'Thesis objective', weather: 'Weather',
+  dailyclose: 'Daily close checklist', photosubject: 'Photo subject'
+};
+var DEFAULTS = {
+  rock: L([['Quartzite', 'Q'], ['Schist', 'Sch'], ['Phyllite', 'Ph'], ['Slate', 'Sl'], ['Marble', 'Mb'], ['Dolomite', 'Dol'], ['Limestone', 'Ls'], ['Gneiss', 'Gn'],
+    ['Amphibolite or metabasic rock', 'Am'], ['Granite', 'Gr'], ['Other igneous rock', 'Ig'], ['Ore', 'Ore'], ['Sandstone', 'Ss'], ['Shale', 'Sh'], ['Metasandstone', 'Msst'],
+    ['Greenschist', 'Gs'], ['Pegmatite', 'Peg'], ['Quartz vein', 'Qv']]),
+  unit: [],
+  colour: L(['White', 'Light grey', 'Grey', 'Dark grey', 'Black', 'Green', 'Dark green', 'Brown', 'Red', 'Yellow', 'Pink', 'Blue grey']),
+  priority: L([['Essential', 'A'], ['High value', 'B'], ['Optional', 'C']]),
+  younging: L([['Younging up', 'Up'], ['Younging down', 'Down'], ['Unknown', 'Unk']]),
+  evidence: L(['Graded bedding', 'Cross bedding', 'Ripple marks', 'Load structures', 'Stromatolites']),
+  thickness: L([['Very thick (over 1 m)', 'VT'], ['Thick (30 cm to 1 m)', 'T'], ['Medium (10 to 30 cm)', 'M'], ['Thin (under 10 cm)', 'Th']]),
+  grain: L([['Very coarse (over 2 mm)', 'VC'], ['Coarse (1 to 2 mm)', 'C'], ['Medium (0.75 to 1 mm)', 'M'], ['Fine (under 0.75 mm)', 'F']]),
+  fabric: L(['Massive', 'Banded']),
+  fabric_sub: L([['Bedded', 'Bed'], ['Slaty', 'Sl'], ['Schistose', 'Sch'], ['Gneissic', 'Gneiss']]),
+  extras: L(['Vein', 'Pegmatite', 'Dyke', 'Pod']),
+  contact: L([['Conformable', 'Co'], ['Unconformity', 'Un'], ['Fault or thrust', 'Fa'], ['Intrusive', 'In']]),
+  structtype: L([['Bedding', 'S0'], ['First foliation', 'S1'], ['Second foliation', 'S2'], ['Mineral lineation', 'Lm'], ['Stretching lineation', 'Ls'], ['Rod lineation', 'Lr'],
+    ['Fold axis', 'Fx'], ['Axial plane', 'Ap'], ['Joint', 'J'], ['Fault', 'Ft'], ['Vein', 'Ve'], ['Boudin axis', 'Bd']]),
+  quality: L([['Measured on outcrop', 'M'], ['Estimated', 'E'], ['Float (loose block)', 'F']]),
+  folform: L([['Continuous', 'Cont'], ['Spaced', 'Sp'], ['Crenulated', 'Cren']]),
+  closure: L([['Antiform', 'Ant'], ['Synform', 'Syn'], ['Recumbent', 'Rec']]),
+  shape: L([['Cylindrical', 'Cyl'], ['Non-cylindrical', 'Non']]),
+  tight: L([['Open', ''], ['Close', ''], ['Tight', ''], ['Isoclinal', 'Iso']]),
+  asym: L([['S shaped', 'S'], ['Z shaped', 'Z'], ['M shaped (symmetric)', 'M']]),
+  yesno: L(['Yes', 'No']),
+  conf: L([['High', 'H'], ['Medium', 'M'], ['Low', 'L']]),
+  kind: L(['Thrust', 'Fault', 'Shear zone', 'Contact']),
+  seen: L([['Directly seen', 'Direct'], ['Seen in float only', 'Float'], ['Inferred', 'Inf'], ['Concealed', 'Conc']]),
+  faultrock: L([['Breccia', 'Brec'], ['Gouge', 'Goug'], ['Cataclasite', 'Cata'], ['Mylonite', 'Myl']]),
+  style: L([['Ductile', 'Duct'], ['Brittle', 'Brit']]),
+  rep: L([['Repetition of units', 'Rep'], ['Omission of units', 'Omit'], ['None', 'No']]),
+  fabrics: L([['Bedding', 'S0'], ['First foliation', 'S1'], ['Second foliation', 'S2'], ['Crenulation cleavage', 'Cren'], ['Lineation', 'Lin']]),
+  phase: L([['Phase 1: bedding parallel foliation', 'D1'], ['Phase 2: folds, isoclinal folds', 'D2'], ['Phase 3: shear sense indicators', 'D3'],
+    ['Phase 4: folds and crenulation cleavage', 'D4'], ['Phase 5: shear zones and fractures', 'D5']]),
+  indicators: L(['Asymmetric boudin', 'Strain shadow', 'Mica fish', 'Rotated garnet', 'Flanking structure', 'Drag fold', 'S to C fabric', 'Sheath fold']),
+  index: L([['Chlorite', 'Chl'], ['Biotite', 'Bt'], ['Garnet', 'Grt'], ['Staurolite', 'St'], ['Kyanite', 'Ky'], ['Sillimanite', 'Sil'], ['Muscovite', 'Ms'], ['Actinolite', 'Act'], ['Hornblende', 'Hbl']]),
+  mode: L([['Porphyroblast', 'Porph'], ['Matrix mineral', 'Matrix'], ['Replaced', 'Rep']]),
+  timing: L([['Before foliation', 'Pre'], ['During foliation', 'Syn'], ['After foliation', 'Post']]),
+  texture: L([['Porphyroblastic', 'Por'], ['Granoblastic', 'Gra'], ['Porphyroclastic', 'Pcl'], ['Mylonitic', 'Myl']]),
+  retro: L([['Chloritization', 'Chl'], ['Sericitization', 'Ser'], ['None', '']]),
+  side: L(['Lower grade side', 'Higher grade side']),
+  deposit: L(['Vein', 'Boudin', 'Lens', 'Stratabound', 'Disseminated', 'Breccia', 'Replacement', 'Pocket']),
+  control: L(['Bedding', 'Foliation', 'Fracture', 'Contact', 'Fold hinge', 'Shear zone', 'Discordant']),
+  ore: L([['Chalcopyrite', 'Cpy'], ['Pyrite', 'Py'], ['Galena', 'Gal'], ['Sphalerite', 'Sph'], ['Hematite', 'Hem'], ['Magnetite', 'Mag'], ['Pyrrhotite', 'Po'], ['Bornite', 'Bn']]),
+  oxid: L(['Malachite', 'Azurite', 'Limonite', 'None']),
+  gangue: L(['Quartz', 'Calcite', 'Dolomite', 'Chlorite']),
+  alt: L(['Silicification', 'Chloritization', 'Sericitization', 'Carbonate alteration', 'Iron staining', 'None']),
+  oretiming: L(['Folded or boudinaged', 'Along foliation or in pressure shadow', 'Cuts foliation', 'Cuts folds', 'Replacement texture', 'Late oxidation']),
+  old: L(['None', 'Present (do not enter)']),
+  samplestaken: L(['Fresh ore', 'Gangue', 'Altered host rock', 'Unaltered host rock', 'Oriented specimen']),
+  isotype: L(['Carbonate', 'Quartz', 'Silicate']),
+  veingen: L(['Early vein', 'Late vein', 'Not applicable']),
+  fabricrel: L(['Along foliation', 'Cuts foliation', 'Folded']),
+  isoq: L(['Fluid source', 'Temperature', 'Fluid-rock interaction', 'Protolith']),
+  bodytype: L(['Metabasic', 'Granitoid', 'Orthogneiss']),
+  bodyform: L(['Dyke', 'Sill', 'Pluton', 'Tectonic slice', 'Boudin', 'Lens']),
+  bodycontact: L(['Sharp', 'Gradational']),
+  intr: L(['Chilled margin', 'Apophyses', 'Xenoliths', 'Cross-cutting']),
+  tect: L(['Shear zone', 'Fault rock', 'Truncation', 'Parallel to foliation']),
+  internal: L(['Foliation', 'Lineation', 'Augen', 'Banding', 'Enclaves', 'Pegmatite or aplite veins']),
+  deform: L(['Undeformed', 'Weak', 'Strong']),
+  bodysamples: L(['Fresh interior', 'Other facies', 'Contact', 'Enclave', 'Fabric sample']),
+  other: L(['Spring', 'Landslide', 'Fault scarp', 'Old working', 'Soil or stream sample', 'Fossil']),
+  analyses: L([['Thin section', 'TS'], ['Polished section', 'PS'], ['XRD', 'XRD'], ['XRF', 'XRF'], ['AAS', 'AAS'], ['ICP-MS', 'ICP'], ['Oxygen isotope', 'O-iso']]),
+  objective: L(['Objective 1: stratigraphy', 'Objective 2: structure', 'Objective 3: metamorphism', 'Objective 4: nappe root zone', 'Objective 5: mineralization']),
+  weather: L(['Clear', 'Partly cloudy', 'Cloudy', 'Rain', 'Fog', 'Snow']),
+  dailyclose: L(['Samples in register', 'Photos matched', 'GPS exported', 'Files backed up twice', 'Map corrected', 'Samples sealed']),
+  photosubject: L([['Overview', 'Ov'], ['Contact or structure', 'Cs'], ['Close up', 'Cu'], ['Close up with scale and north', 'Sc'], ['Sample', 'Sm']])
+};
+var SAVEDCAT = {};
+function copyItems(a) { return a.map(function (x) { return {n: x.n, c: x.c, u: x.u}; }); }
+function loadCatalog() {
+  try { SAVEDCAT = JSON.parse(localStorage.getItem(LC) || '{}'); } catch (e) { SAVEDCAT = {}; }
+  Object.keys(DEFAULTS).forEach(function (k) { S.catalog[k] = SAVEDCAT[k] ? SAVEDCAT[k] : copyItems(DEFAULTS[k]); });
+}
+function catItems(key) { return S.catalog[key] || []; }
+function addCatalogItem(key, name, code) {
+  name = String(name || '').trim(); if (!name) return null;
+  var list = S.catalog[key] || (S.catalog[key] = []), low = name.toLowerCase();
+  for (var i = 0; i < list.length; i++) if (list[i].n.toLowerCase() === low) return list[i];
+  var it = {n: name, c: String(code || '').trim(), u: true}; list.push(it); saveCatalog(); return it;
+}
+/* register a new editable list (used by the field definitions) */
+function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, ''); }
+function reg(group, label, items) {
+  var key = slug(group + ' ' + label);
+  if (!DEFAULTS[key]) { DEFAULTS[key] = L(items); CATALOG_META[key] = group + ': ' + label; S.catalog[key] = SAVEDCAT[key] ? SAVEDCAT[key] : copyItems(DEFAULTS[key]); }
+  return key;
+}
+loadCatalog();
+
+/* ---------- extra shared lists ---------- */
+function setList(key, label, items) { DEFAULTS[key] = L(items); CATALOG_META[key] = label; S.catalog[key] = SAVEDCAT[key] ? SAVEDCAT[key] : copyItems(DEFAULTS[key]); }
+var PRESENT = {
+  S1: 'Bedding, lithology and younging', ST: 'Structures (folds, thrusts, faults, joints)', DF: 'Deformation features', MT: 'Metamorphism',
+  MN: 'Mineralization', IG: 'Igneous body', FS: 'Fossils', HZ: 'Hazards', OT: 'Other geological studies'
+};
+setList('present', 'What is present at this station', Object.keys(PRESENT).map(function (k) { return PRESENT[k]; }));
+setList('analyses', 'Analyses planned', [['Thin section', 'TS'], ['Polished section', 'PS'], ['XRD', 'XRD'], ['XRF', 'XRF'], ['AAS', 'AAS'], ['ICP-MS', 'ICP'], ['Fire assay (gold)', 'FA'],
+  ['Stable isotopes (O, C)', 'Iso'], ['Geochronology', 'Age'], ['SEM or microprobe', 'SEM'], ['Fluid inclusions', 'FI'], ['Micropaleontology', 'Micro'], ['Palynology', 'Pal'], ['Geotechnical test', 'Geo'], ['Water chemistry', 'Wat']]);
+setList('defphase', 'Deformation phase', [['Phase 1: bedding parallel foliation', 'D1'], ['Phase 2: folds, isoclinal folds', 'D2'], ['Phase 3: shear sense indicators', 'D3'],
+  ['Phase 4: folds and crenulation cleavage', 'D4'], ['Phase 5: shear zones and fractures', 'D5'], ['Not known', '']]);
+
+/* ---------- plain forms (station, daily log, questions) ---------- */
+function F(k, label, type, x) { var o = {k: k, label: label, type: type}; if (x) Object.keys(x).forEach(function (a) { o[a] = x[a]; }); return o; }
+var SHEETS = {
+  S0: {title: 'Station', short: 'Station', xl: 'Station', sub: 'Position and basic description', fields: [
+    F('stn', 'Station code', 'text', {auto: 'stn'}), F('gps', 'Position', 'gps', {keys: ['lat', 'lon', 'elev', 'acc']}),
+    F('location', 'Location', 'text'), F('rock', 'Main rock', 'pick', {list: 'rock'}), F('unit', 'Unit or formation', 'pick', {list: 'unit'}),
+    F('priority', 'Priority', 'pick', {list: 'priority'}), F('present', 'What is present at this station', 'check', {list: 'present'}),
+    F('notes', 'Notes', 'area')]},
+  DL: {title: 'Daily log', short: 'Daily log', xl: 'Daily log', sub: 'End of day', nostn: true, fields: [
+    F('day', 'Day number', 'num', {auto: 'day'}), F('date', 'Date', 'date', {auto: 'date'}), F('weather', 'Weather', 'pick', {list: 'weather'}),
+    F('team', 'Team', 'text'), F('route', 'Route, area', 'text'), F('plan', 'Plan: priority questions', 'area'), F('stations', 'Stations today', 'text', {auto: 'cnt_st'}),
+    F('photos', 'Photos today', 'text', {auto: 'cnt_ph'}), F('track', 'GPS track file', 'text'),
+    F('obs', 'Main observations and results', 'area'), F('problems', 'Problems, safety, access', 'area'), F('tomorrow', "Tomorrow's priorities", 'area'),
+    F('turn', 'Turnaround time', 'text'), F('back', 'Back by', 'text'), F('close', 'Daily close', 'check', {list: 'dailyclose'})]},
+  KQ: {title: 'Key question', short: 'Questions', xl: 'Questions', sub: 'Before leaving', nostn: true, fields: [
+    F('no', 'Number', 'num', {auto: 'kq'}), F('question', 'Question', 'area'), F('objective', 'Objective', 'multi', {list: 'objective'}),
+    F('priority', 'Priority', 'pick', {list: 'priority'}), F('where', 'Where', 'text'), F('sample', 'Sample needed', 'text'), F('done', 'Done', 'pick', {list: 'yesno'}),
+    F('answer', 'Answer or result', 'area')]}
+};
+/* the ten steps of the station flow; some hold two sections */
+var STEPINFO = {
+  S0: {short: 'Station', title: 'Station', secs: ['S0']}, S1: {short: 'Strat.', title: 'Stratigraphy', secs: ['S1', 'S1E']},
+  ST: {short: 'Structure', title: 'Structure', secs: ['ST']}, DF: {short: 'Deform.', title: 'Deformation features', secs: ['DF']},
+  MT: {short: 'Metamorphism', title: 'Metamorphism', secs: ['MT']}, MN: {short: 'Mineral', title: 'Mineralization', secs: ['MN']},
+  IG: {short: 'Igneous', title: 'Igneous body', secs: ['IG']}, FS: {short: 'Fossils', title: 'Fossils', secs: ['FS']},
+  HZ: {short: 'Hazards', title: 'Hazards and disaster', secs: ['HZ']}, OT: {short: 'Other', title: 'Other geological studies', secs: ['OT']}
+};
+var STEPS = ['S0', 'S1', 'ST', 'DF', 'MT', 'MN', 'IG', 'FS', 'HZ', 'OT'];
+var XLORDER = ['S0', 'S1', 'S1E', 'ST', 'DF', 'MT', 'MN', 'IG', 'FS', 'HZ', 'OT', 'DL', 'KQ'];
+var SPEC = {};   /* entry definitions, filled in below */
+
+/* ---------- project, station and code logic ---------- */
+function proj() { return S.settings.project || ''; }
+function recs(sheet) { var p = proj(); return S.records.filter(function (r) { return r.sheet === sheet && r.project === p; }); }
+function projPhotos() { var p = proj(); return S.photos.filter(function (x) { return x.project === p; }); }
+function flow() {
+  var p = proj(), f = S.settings.flow[p];
+  if (!f) { f = S.settings.flow[p] = {stn: '', step: 0, sec: 0}; }
+  if (!f.stn) f.stn = nextStn();
+  return f;
+}
+function stnNum(s) { var m = String(s || '').match(/(\d+)/); return m ? parseInt(m[1], 10) : 0; }
+function nextStn() {
+  var m = 0; recs('S0').forEach(function (r) { var n = stnNum(r.stn); if (n > m) m = n; });
+  return 'St_' + pad2(m + 1);
+}
+function stnBase(s) { return String(s || 'NoStn').replace(/[^A-Za-z0-9]/g, ''); }
+function stationSaved(stn) { return recs('S0').some(function (r) { return r.stn === stn; }); }
+function stationRec(stn) { return recs('S0').filter(function (r) { return r.stn === stn; })[0] || null; }
+function allCodes() {
+  var a = [], p = proj();
+  S.photos.forEach(function (x) { if (x.project === p) a.push(x.name); });
+  S.records.forEach(function (r) { if (r.project !== p) return; if (r.code) a.push(r.code); (r.samples || []).forEach(function (s) { a.push(s.code); }); });
+  return a;
+}
+function nextCode(prefix, extra) {
+  var re = new RegExp('^' + prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(\\d+)$'), m = 0;
+  allCodes().concat(extra || []).forEach(function (c) { var x = re.exec(String(c)); if (x && +x[1] > m) m = +x[1]; });
+  return prefix + (m + 1);
+}
+function nextPhoto(stn) { return nextCode(stnBase(stn) + '_ph'); }
+function projectNumber(sheet, key, re) {   /* highest number used in a project wide code */
+  var m = 0; recs(sheet).forEach(function (r) { var x = re.exec(String(r[key] || '')); if (x && +x[1] > m) m = +x[1]; }); return m;
+}
+function autoValue(kind) {
+  var t = today();
+  if (kind === 'stn') return flow().stn;
+  if (kind === 'day') return recs('DL').length + 1;
+  if (kind === 'date') return t;
+  if (kind === 'kq') return recs('KQ').length + 1;
+  var todays = function (sheet) { return recs(sheet).filter(function (r) { return String(r.created || '').slice(0, 10) === t; }); };
+  if (kind === 'cnt_st') { var a = todays('S0'); return a.length ? a[0].stn + ' to ' + a[a.length - 1].stn : ''; }
+  if (kind === 'cnt_ph') return String(projPhotos().filter(function (p) { return String(p.time).slice(0, 10) === t; }).length);
+  return '';
+}
+
+/* =====================================================================
+   Field definitions. Each step has entries; typed steps first ask for the
+   type, then show only the classification and measurements that apply.
+   ===================================================================== */
+var CURG = '';
+function mk(o, x) { return Object.assign(o, x || {}); }
+function Pk(k, label, items, o) { return mk({k: k, label: label, type: 'pick', list: reg(CURG, label, items)}, o); }
+function Mk(k, label, items, o) { return mk({k: k, label: label, type: 'multi', list: reg(CURG, label, items)}, o); }
+function Ck(k, label, items, o) { return mk({k: k, label: label, type: 'check', list: reg(CURG, label, items)}, o); }
+function Ps(k, label, list, o) { return mk({k: k, label: label, type: 'pick', list: list}, o); }
+function Cs(k, label, list, o) { return mk({k: k, label: label, type: 'check', list: list}, o); }
+function Pl(k, label, o) { return mk({k: k, label: label, type: 'orient', mode: 'plane', keys: [k + '_dd', k + '_da'], labels: ['Dip direction (DD)', 'Dip angle (DA)'], ph: ['DD', 'DA']}, o); }
+function Ln(k, label, o) { return mk({k: k, label: label, type: 'orient', mode: 'line', keys: [k + '_tr', k + '_pl'], labels: ['Trend', 'Plunge'], ph: ['Trend', 'Plunge']}, o); }
+function Nu(k, label, unit, o) { return mk({k: k, label: label + (unit ? ' (' + unit + ')' : ''), type: 'num', unit: unit || ''}, o); }
+function Tx(k, label, o) { return mk({k: k, label: label, type: 'text'}, o); }
+function Ar(k, label, o) { return mk({k: k, label: label, type: 'area'}, o); }
+function G(group) { CURG = group; }
+function typeList(group, label, types) { return reg(group, label, Object.keys(types)); }
+var SHEAR = ['Top to south', 'Top to north', 'Top to east', 'Top to west', 'Top to southwest', 'Top to southeast', 'Dextral (right-lateral)', 'Sinistral (left-lateral)', 'Normal (extension)', 'Reverse (shortening)', 'Not determined'];
+var CLASTIC = /sandstone|shale|siltstone|conglomerate|quartzite|slate|phyllite|greywacke/i, CARBONATE = /marble|limestone|dolomit/i;
+function sampleTypes(group, items) { return reg(group, 'Sample type', items); }
+
+/* ---------- 2 Stratigraphy: lithology of the outcrop ---------- */
+G('Stratigraphy: lithology');
+SPEC.S1 = {id: 'S1', title: 'Lithology and bedding', sub: 'One bed or unit at this outcrop', typed: false,
+  photo: {label: 'Outcrop photos of the lithology', prefix: function (stn) { return stnBase(stn) + '_str'; }},
+  sample: {prefix: function (stn) { return stnBase(stn) + '_sm'; }, types: sampleTypes('Stratigraphy', ['Hand specimen', 'Oriented hand specimen', 'Thin section sample', 'Bulk sample', 'Geochemistry sample'])},
+  fields: [
+    Ps('rock', 'Rock type', 'rock', {grp: 'Lithology', cap: true}), Ps('colour', 'Colour', 'colour', {cap: true}),
+    Pk('weather', 'Weathering', ['Fresh', 'Slightly weathered', 'Moderately weathered', 'Highly weathered', 'Completely weathered']),
+    Ps('thickness', 'Bed thickness', 'thickness', {cap: true}), Ps('grain', 'Grain size', 'grain', {cap: true}),
+    Pk('sorting', 'Sorting', ['Well sorted', 'Moderately sorted', 'Poorly sorted'], {when: function (v) { return CLASTIC.test(v.rock || ''); }}),
+    Pk('rounding', 'Grain rounding', ['Angular', 'Subangular', 'Subrounded', 'Rounded'], {when: function (v) { return CLASTIC.test(v.rock || ''); }}),
+    Pk('hcl', 'Reaction with dilute HCl', ['No reaction', 'Weak (slow fizz)', 'Strong (vigorous fizz)', 'Only as powder (dolomite)'], {when: function (v) { return CARBONATE.test(v.rock || ''); }}),
+    Pk('ctexture', 'Carbonate texture', ['Micritic', 'Sparry', 'Oolitic', 'Stromatolitic', 'Fossiliferous', 'Brecciated'], {when: function (v) { return CARBONATE.test(v.rock || ''); }}),
+    Ps('fabric', 'Fabric', 'fabric', {cap: true}), Ps('fabric_sub', 'If banded', 'fabric_sub', {when: function (v) { return v.fabric === 'Banded'; }}),
+    Pk('bedform', 'Bedding form', ['Planar', 'Wavy', 'Lenticular', 'Cross-bedded', 'No bedding (massive)']),
+    Pl('bedding', 'Bedding attitude', {grp: 'Bedding and contacts', cap: true}),
+    Ps('contact', 'Contact below', 'contact'), Ps('contactabove', 'Contact above', 'contact'),
+    Ps('younging', 'Younging direction', 'younging', {grp: 'Younging', cap: true, hintx: 'Record each piece of evidence in the Younging evidence section.'}),
+    Nu('base', 'Base height in section', 'm', {grp: 'Position'}), Tx('section', 'Section name'),
+    Pk('exposure', 'Exposure', ['Good', 'Fair', 'Poor (soil or vegetation cover)']),
+    Pk('overprint', 'Metamorphic overprint', ['None seen', 'Low grade', 'Medium grade', 'Retrograde']),
+    Ar('notes', 'Notes', {grp: 'Notes'})]};
+
+/* ---------- 2 Stratigraphy: younging evidence ---------- */
+G('Stratigraphy: younging evidence');
+SPEC.S1E = {id: 'S1E', title: 'Younging evidence', sub: 'Add the evidence one by one, each with its measurements and photo', typed: true, typeKey: 'etype', typeLabel: 'Evidence type',
+  photo: {label: 'Photos of the evidence', prefix: function (stn) { return stnBase(stn) + '_ps'; }}, sample: null,
+  types: {
+    'Graded bedding': function () { G('Younging: graded bedding'); return {
+      cls: [Pk('grading', 'Grading type', ['Normal grading (coarse at base)', 'Reverse grading (fine at base)', 'Complex grading'])],
+      meas: [Ps('gbase', 'Grain size at base', 'grain'), Ps('gtop', 'Grain size at top', 'grain'), Nu('bedt', 'Bed thickness', 'cm')]}; },
+    'Cross bedding': function () { G('Younging: cross bedding'); return {
+      cls: [Pk('xtype', 'Cross bedding type', ['Planar (tabular)', 'Trough', 'Herringbone', 'Hummocky', 'Wedge-shaped']), Pk('xbase', 'Foreset base', ['Tangential (asymptotic)', 'Angular', 'Truncated'])],
+      meas: [Pl('foreset', 'Foreset'), Pl('setbound', 'Set boundary'), Nu('setthk', 'Set thickness', 'cm')]}; },
+    'Ripple marks': function () { G('Younging: ripple marks'); return {
+      cls: [Pk('rsym', 'Symmetry', ['Symmetrical (wave)', 'Asymmetrical (current)', 'Interference']), Pk('rcrest', 'Crest form', ['Straight', 'Sinuous', 'Linguoid', 'Catenary'])],
+      meas: [Ln('crest', 'Crest line'), Ln('lee', 'Lee side direction'), Nu('wl', 'Wavelength', 'cm'), Nu('amp', 'Amplitude', 'cm')]}; },
+    'Load and flame structures': function () { G('Younging: load structures'); return {
+      cls: [Pk('ltype', 'Structure', ['Load cast', 'Flame structure', 'Ball and pillow', 'Convolute lamination'])],
+      meas: [Nu('size', 'Size', 'cm'), Ln('elong', 'Elongation direction')]}; },
+    'Scour, flute and tool marks': function () { G('Younging: scour marks'); return {
+      cls: [Pk('stype', 'Mark type', ['Flute cast', 'Groove cast', 'Tool mark', 'Channel scour'])],
+      meas: [Ln('flow', 'Flow direction'), Nu('len', 'Length', 'cm'), Nu('wid', 'Width', 'cm'), Nu('dep', 'Depth', 'cm')]}; },
+    'Stromatolites': function () { G('Younging: stromatolites'); return {
+      cls: [Pk('sform', 'Form', ['Laterally linked hemispheroids (LLH)', 'Stacked hemispheroids (SH)', 'Columnar', 'Domal', 'Stratiform (planar)', 'Conical']), Pk('convex', 'Convexity', ['Convex up', 'Convex down', 'Not clear'])],
+      meas: [Nu('h', 'Height', 'cm'), Nu('w', 'Width', 'cm')]}; },
+    'Mud cracks': function () { G('Younging: mud cracks'); return {
+      cls: [Pk('mtype', 'Crack form', ['Polygonal', 'Sinuous', 'Sand-filled cracks']), Pk('tip', 'V-tip direction', ['Pointing down', 'Pointing up', 'Not clear'])],
+      meas: [Nu('poly', 'Polygon diameter', 'cm'), Nu('depth', 'Crack depth', 'cm')]}; },
+    'Bedding and cleavage relationship': function () { G('Younging: bedding and cleavage'); return {
+      cls: [Pk('rel', 'Relationship', ['Cleavage dips steeper than bedding', 'Cleavage dips gentler than bedding', 'Cleavage parallel to bedding', 'Cleavage perpendicular to bedding']),
+        Pk('pos', 'Fold limb position', ['Normal limb', 'Overturned limb', 'Near the hinge'])],
+      meas: [Pl('bed', 'Bedding'), Pl('clv', 'Cleavage'), Ln('int', 'Bedding and cleavage intersection')]}; },
+    'Geopetal structure': function () { G('Younging: geopetal'); return {
+      cls: [Pk('gfill', 'Infill', ['Sediment', 'Cement', 'Mud', 'Sparry calcite'])], meas: [Pl('floor', 'Geopetal floor'), Nu('cav', 'Cavity size', 'cm')]}; },
+    'Fining or coarsening upward': function () { G('Younging: grain size trend'); return {
+      cls: [Pk('trend', 'Trend', ['Fining upward', 'Coarsening upward', 'Thinning upward', 'Thickening upward'])],
+      meas: [Nu('seq', 'Sequence thickness', 'm'), Nu('beds', 'Number of beds counted', '')]}; },
+    'Other evidence': function () { G('Younging: other'); return {cls: [Tx('what', 'Describe the evidence')], meas: [Pl('plane', 'Plane, if any'), Ln('line', 'Line, if any')]}; }
+  },
+  common: [Ps('indicates', 'Younging direction shown', 'younging', {cap: true}), Ps('conf', 'Confidence', 'conf'), Ar('notes', 'Notes')]};
+
+/* ---------- 3 Structure ---------- */
+SPEC.ST = {id: 'ST', title: 'Structure', sub: 'Choose the structure type, then classify and measure it', typed: true, typeKey: 'stype', typeLabel: 'Structure type',
+  photo: {label: 'Photos of the structure', prefix: function (stn) { return stnBase(stn) + '_ss'; }},
+  sample: {prefix: function (stn) { return stnBase(stn) + '_sm'; }, types: sampleTypes('Structure', ['Oriented hand specimen', 'Fault rock sample', 'Vein sample', 'Hand specimen', 'Thin section sample'])},
+  types: {
+    'Fold': function () { G('Structure: fold'); return {
+      cls: [Pk('closure', 'Closure', ['Antiform', 'Synform', 'Anticline', 'Syncline', 'Monocline', 'Neutral fold']),
+        Pk('tight', 'Tightness (interlimb angle)', ['Gentle (120 to 180 degrees)', 'Open (70 to 120 degrees)', 'Close (30 to 70 degrees)', 'Tight (0 to 30 degrees)', 'Isoclinal (0 degrees)']),
+        Pk('attitude', 'Axial plane attitude', ['Upright', 'Steeply inclined', 'Moderately inclined', 'Gently inclined', 'Recumbent']),
+        Pk('sym', 'Symmetry or vergence', ['Symmetric', 'Asymmetric S', 'Asymmetric Z', 'Asymmetric M']),
+        Pk('style', 'Fold style', ['Parallel (concentric)', 'Similar', 'Chevron', 'Box', 'Kink', 'Disharmonic', 'Ptygmatic']),
+        Pk('cyl', 'Cylindricity', ['Cylindrical', 'Non-cylindrical', 'Doubly plunging']),
+        Pk('scale', 'Scale', ['Microscopic', 'Mesoscopic (outcrop)', 'Macroscopic (map scale)']), Pk('gen', 'Fold generation', ['F1', 'F2', 'F3', 'Unknown']),
+        Ps('folded', 'Folded rock', 'rock')],
+      meas: [Pl('axplane', 'Axial plane'), Ln('axis', 'Fold axis (hinge line)'), Pl('limb1', 'Limb 1'), Pl('limb2', 'Limb 2'), Nu('ila', 'Interlimb angle', 'degrees'),
+        Nu('wl', 'Wavelength', 'm'), Nu('amp', 'Amplitude', 'm'), Pl('apf', 'Axial planar foliation'), Ln('lin', 'Associated lineation')]}; },
+    'Thrust': function () { G('Structure: thrust'); return {
+      cls: [Pk('tname', 'Thrust name or rank', ['Main Central Thrust (MCT)', 'Main Boundary Thrust (MBT)', 'Main Frontal Thrust (MFT)', 'Thrust sheet boundary', 'Local or minor thrust', 'Out-of-sequence thrust', 'Blind thrust']),
+        Pk('tgeom', 'Geometry', ['Flat', 'Ramp', 'Flat-ramp-flat', 'Listric', 'Duplex horse boundary']),
+        Pk('tpos', 'Position in the thrust system', ['Floor thrust', 'Roof thrust', 'Splay', 'Basal detachment', 'Imbricate fault']),
+        Ck('trock', 'Fault rocks', ['Breccia', 'Gouge', 'Cataclasite', 'Mylonite', 'Phyllonite', 'Quartz veining']), Pk('tstyle', 'Deformation style', ['Brittle', 'Brittle-ductile', 'Ductile']),
+        Ck('tevid', 'Evidence for the thrust', ['Truncated beds', 'Repeated units', 'Omitted units', 'Juxtaposed rock types', 'Jump in metamorphic grade', 'Fault rock present', 'Topographic break or spring']),
+        Pk('tsense', 'Shear sense', SHEAR), Ps('hw', 'Hanging wall rock', 'rock'), Ps('fw', 'Footwall rock', 'rock'), Tx('hwunit', 'Hanging wall unit'), Tx('fwunit', 'Footwall unit')],
+      meas: [Pl('fplane', 'Thrust plane'), Ln('slick', 'Slickenline or stretching lineation'), Pl('hwbed', 'Hanging wall bedding'), Pl('fwbed', 'Footwall bedding'),
+        Nu('core', 'Fault core thickness', 'm'), Nu('dmg', 'Damage zone thickness', 'm'), Nu('disp', 'Estimated displacement', 'm'), Nu('pitch', 'Pitch of lineation', 'degrees')]}; },
+    'Fault': function () { G('Structure: fault'); return {
+      cls: [Pk('fkind', 'Fault type', ['Normal fault', 'Reverse fault', 'Strike-slip fault, dextral', 'Strike-slip fault, sinistral', 'Oblique-slip fault']),
+        Ck('fidx', 'Slip sense indicators', ['Slickenside steps', 'Riedel shears', 'Offset marker', 'Drag folds', 'Fibre growth', 'Trailing fractures']),
+        Ck('frock', 'Fault rocks', ['Breccia', 'Gouge', 'Cataclasite', 'Fault core with veins']), Pk('fact', 'Activity', ['Active or recent', 'Old (inactive)', 'Reactivated', 'Unknown']),
+        Pk('fscale', 'Scale', ['Minor (outcrop)', 'Major (mapped)']), Ps('fwrock', 'Rock cut by the fault', 'rock')],
+      meas: [Pl('fplane', 'Fault plane'), Ln('slick', 'Slickenline'), Nu('pitch', 'Pitch', 'degrees'), Nu('throw', 'Throw or offset', 'm'), Nu('core', 'Fault core thickness', 'm'),
+        Nu('dmg', 'Damage zone thickness', 'm'), Nu('scarp', 'Scarp height', 'm')]}; },
+    'Joint set': function () { G('Structure: joint'); return {
+      cls: [Pk('jtype', 'Joint type', ['Systematic joint', 'Cross joint', 'Sheeting joint', 'Extension joint', 'Shear joint', 'Columnar joint', 'Unloading joint']),
+        Pk('jset', 'Set number', ['Set 1', 'Set 2', 'Set 3', 'Set 4', 'Random']), Pk('jsurf', 'Surface', ['Smooth planar', 'Rough', 'Plumose', 'Stepped']),
+        Pk('jfill', 'Filling', ['Open (no filling)', 'Quartz', 'Calcite', 'Iron oxide', 'Clay', 'Chlorite']), Pk('jrel', 'Relation to foliation', ['Parallel', 'Perpendicular', 'Oblique', 'Not related']),
+        Pk('jpers', 'Persistence', ['Low (under 1 m)', 'Medium (1 to 3 m)', 'High (3 to 10 m)', 'Very high (over 10 m)'])],
+      meas: [Pl('joint', 'Joint plane'), Nu('space', 'Spacing', 'cm'), Nu('apert', 'Aperture', 'mm'), Nu('count', 'Number of joints measured', ''), Nu('len', 'Trace length', 'm')]}; },
+    'Vein or fracture filling': function () { G('Structure: vein'); return {
+      cls: [Pk('vmin', 'Vein mineral', ['Quartz', 'Calcite', 'Dolomite', 'Chlorite', 'Epidote', 'Sulphide', 'Iron oxide', 'Mixed']),
+        Pk('vgeom', 'Geometry', ['Planar', 'Sigmoidal', 'En echelon', 'Stockwork', 'Boudinaged', 'Folded', 'Anastomosing']),
+        Pk('vrel', 'Relation to foliation', ['Parallel', 'Cutting the foliation', 'Folded with the foliation']), Pk('vtex', 'Vein texture', ['Massive', 'Blocky', 'Fibrous', 'Comb', 'Banded (crack-seal)']),
+        Pk('vgen', 'Vein generation', ['Early', 'Middle', 'Late', 'Unknown'])],
+      meas: [Pl('vplane', 'Vein plane'), Ln('fibre', 'Fibre direction'), Nu('vthk', 'Thickness', 'cm'), Nu('vspace', 'Spacing', 'cm'), Nu('vlen', 'Length', 'm')]}; },
+    'Contact': function () { G('Structure: contact'); return {
+      cls: [Pk('ctype', 'Contact type', ['Conformable (depositional)', 'Gradational', 'Intrusive', 'Tectonic (faulted or sheared)', 'Unconformity', 'Metamorphic zone boundary', 'Facies change']),
+        Pk('csharp', 'Sharpness', ['Sharp', 'Gradual over centimetres', 'Gradual over metres']), Pk('cseen', 'How well seen', ['Directly seen', 'Seen in float only', 'Inferred', 'Concealed']),
+        Ps('rockabove', 'Rock above', 'rock'), Ps('rockbelow', 'Rock below', 'rock'), Tx('above', 'Unit above'), Tx('below', 'Unit below')],
+      meas: [Pl('cplane', 'Contact plane'), Pl('bedabove', 'Bedding above'), Pl('bedbelow', 'Bedding below'), Nu('trans', 'Transition thickness', 'cm')]}; },
+    'Unconformity': function () { G('Structure: unconformity'); return {
+      cls: [Pk('utype', 'Unconformity type', ['Angular unconformity', 'Disconformity', 'Nonconformity', 'Paraconformity']), Pk('basal', 'Basal deposit', ['Basal conglomerate', 'Paleosol', 'Weathered surface', 'None seen']),
+        Tx('uabove', 'Unit above'), Tx('ubelow', 'Unit below')],
+      meas: [Pl('uplane', 'Unconformity surface'), Pl('bedabove', 'Bedding above'), Pl('bedbelow', 'Bedding below'), Nu('relief', 'Surface relief', 'm')]}; },
+    'Lineament': function () { G('Structure: lineament'); return {
+      cls: [Pk('ltype', 'Lineament type', ['Topographic', 'Drainage', 'Vegetation', 'Slope break', 'Fault scarp line']), Pk('lorigin', 'Likely origin', ['Fault', 'Joint set', 'Lithological contact', 'Foliation trend', 'Unknown'])],
+      meas: [Ln('ltrend', 'Lineament trend'), Nu('llen', 'Length', 'm'), Nu('offset', 'Offset', 'm')]}; }
+  },
+  common: [Ps('conf', 'Confidence', 'conf'), Ar('notes', 'Notes')]};
+
+/* ---------- 4 Deformation features ---------- */
+SPEC.DF = {id: 'DF', title: 'Deformation features', sub: 'Shear zones, shear sense, boudins, fabrics and other deformation features', typed: true, typeKey: 'dtype', typeLabel: 'Deformation feature',
+  photo: {label: 'Photos of the feature', prefix: function (stn) { return stnBase(stn) + '_sc'; }},
+  sample: {prefix: function (stn) { return stnBase(stn) + '_sm'; }, types: sampleTypes('Deformation', ['Oriented hand specimen', 'Oriented thin section sample', 'Mylonite sample', 'Hand specimen'])},
+  types: {
+    'Foliation': function () { G('Deformation: foliation'); return {
+      cls: [Pk('ftype', 'Foliation type', ['Slaty cleavage', 'Phyllitic foliation', 'Schistosity', 'Gneissic banding', 'Spaced cleavage', 'Mylonitic foliation', 'Bedding-parallel foliation']),
+        Pk('fform', 'Form', ['Continuous', 'Spaced', 'Anastomosing']), Pk('frel', 'Relation to bedding', ['Parallel', 'Oblique, dips steeper', 'Oblique, dips gentler', 'Perpendicular']),
+        Pk('fint', 'Intensity', ['Weak', 'Moderate', 'Strong', 'Very strong']), Ps('phase', 'Deformation phase', 'defphase'),
+        Ck('fmin', 'Minerals defining the fabric', ['Muscovite', 'Biotite', 'Chlorite', 'Sericite', 'Quartz ribbons', 'Graphite', 'Amphibole'])],
+      meas: [Pl('fol', 'Foliation plane'), Ln('inter', 'Intersection with bedding'), Nu('space', 'Cleavage spacing', 'mm'), Nu('angle', 'Angle to bedding', 'degrees')]}; },
+    'Lineation': function () { G('Deformation: lineation'); return {
+      cls: [Pk('ltype', 'Lineation type', ['Mineral lineation', 'Stretching lineation', 'Rodding', 'Mullion', 'Slickenline', 'Intersection lineation', 'Crenulation lineation', 'Fold axis lineation']),
+        Ck('lmin', 'Defined by', ['Mica', 'Quartz', 'Feldspar', 'Amphibole', 'Kyanite', 'Sillimanite', 'Stretched clasts', 'Elongated pebbles']), Pk('lint', 'Intensity', ['Weak', 'Moderate', 'Strong']),
+        Ps('phase', 'Deformation phase', 'defphase')],
+      meas: [Ln('lin', 'Lineation'), Pl('onplane', 'Plane carrying the lineation'), Nu('pitch', 'Pitch on the plane', 'degrees'), Nu('len', 'Mean length of elements', 'mm')]}; },
+    'Shear zone': function () { G('Deformation: shear zone'); return {
+      cls: [Pk('stype', 'Shear zone type', ['Brittle', 'Brittle-ductile', 'Ductile']), Pk('sfabric', 'Shear rock', ['Mylonite', 'Phyllonite', 'Ultramylonite', 'Protomylonite', 'Cataclasite', 'Gouge', 'Foliated breccia']),
+        Pk('swidth', 'Thickness class', ['Millimetre scale', 'Centimetre scale', 'Metre scale', 'Tens of metres', 'Over 100 metres']), Pk('ssense', 'Shear sense', SHEAR),
+        Ck('sind', 'Sense indicators seen', ['Sigma clasts', 'Delta clasts', 'S to C fabric', 'C-prime shear bands', 'Mica fish', 'Asymmetric boudins', 'Drag folds', 'Offset markers']),
+        Pk('srel', 'Reliability', ['Reliable (several indicators)', 'Probable', 'Doubtful']), Ps('phase', 'Deformation phase', 'defphase')],
+      meas: [Pl('sbound', 'Shear zone boundary'), Pl('sfol', 'Mylonitic foliation'), Ln('lin', 'Stretching lineation'), Nu('thk', 'Thickness', 'm'), Nu('sc', 'S to C angle', 'degrees'),
+        Nu('disp', 'Estimated displacement', 'm'), Nu('len', 'Exposed length', 'm')]}; },
+    'Shear sense indicator': function () { G('Deformation: shear sense indicator'); return {
+      cls: [Pk('itype', 'Indicator', ['Sigma clast', 'Delta clast', 'S to C fabric', 'C-prime shear band', 'Mica fish', 'Asymmetric boudin', 'Drag fold', 'Flanking fold', 'Sheath fold', 'Antithetic fractured grain', 'Offset marker', 'Asymmetric pressure shadow']),
+        Pk('isec', 'Seen in section', ['Parallel to lineation, perpendicular to foliation (XZ)', 'Perpendicular to lineation', 'Other or unknown']), Pk('isense', 'Sense', SHEAR),
+        Ps('conf', 'Confidence', 'conf'), Ps('phase', 'Deformation phase', 'defphase')],
+      meas: [Pl('fol', 'Foliation'), Ln('lin', 'Stretching lineation'), Nu('ang', 'Indicator angle', 'degrees'), Nu('size', 'Indicator size', 'mm')]}; },
+    'Boudinage': function () { G('Deformation: boudinage'); return {
+      cls: [Pk('btype', 'Boudin type', ['Symmetric (pinch and swell)', 'Asymmetric (domino)', 'Torn boudin', 'Block boudin', 'Shear band boudin', 'Gash boudin', 'Mullion']),
+        Ps('blayer', 'Boudinaged layer', 'rock'), Ps('bmatrix', 'Matrix rock', 'rock'), Pk('bcomp', 'Competence contrast', ['High', 'Moderate', 'Low']),
+        Ck('bneck', 'Neck filling', ['Quartz', 'Calcite', 'Host rock', 'Chlorite', 'Empty'])],
+      meas: [Ln('baxis', 'Boudin axis'), Pl('blp', 'Boudinaged layer'), Nu('bneckd', 'Neck to neck spacing', 'cm'), Nu('blen', 'Boudin length', 'cm'), Nu('bthk', 'Layer thickness', 'cm'), Nu('bext', 'Extension', 'percent')]}; },
+    'Crenulation cleavage': function () { G('Deformation: crenulation cleavage'); return {
+      cls: [Pk('ctype', 'Crenulation type', ['Symmetric', 'Asymmetric', 'Zonal', 'Discrete']), Pk('cover', 'Overprinted fabric', ['Bedding (S0)', 'First foliation (S1)', 'Second foliation (S2)']),
+        Pk('cint', 'Development', ['Weak', 'Moderate', 'Strong']), Ps('phase', 'Deformation phase', 'defphase')],
+      meas: [Pl('cc', 'Crenulation cleavage plane'), Ln('cl', 'Crenulation lineation'), Nu('wl', 'Wavelength', 'mm'), Nu('amp', 'Amplitude', 'mm')]}; },
+    'Strain marker': function () { G('Deformation: strain marker'); return {
+      cls: [Pk('mtype', 'Marker', ['Stretched pebbles', 'Reduction spots', 'Deformed fossils', 'Ooids', 'Deformed vesicles', 'Veins', 'Xenoliths']), Pk('mshape', 'Shape', ['Oblate (flattened)', 'Prolate (elongated)', 'Plane strain'])],
+      meas: [Nu('x', 'X axis (longest)', 'mm'), Nu('y', 'Y axis (intermediate)', 'mm'), Nu('z', 'Z axis (shortest)', 'mm'), Ln('xl', 'X axis direction'), Pl('xy', 'XY plane (foliation)')]}; },
+    'Kink band': function () { G('Deformation: kink band'); return {
+      cls: [Pk('ktype', 'Kink band', ['Single kink band', 'Conjugate kink bands', 'Chevron kink fold']), Pk('ksense', 'Sense of rotation', ['Dextral', 'Sinistral', 'Not clear']), Ps('phase', 'Deformation phase', 'defphase')],
+      meas: [Pl('kband', 'Kink band boundary'), Ln('kaxis', 'Kink axis'), Nu('kw', 'Band width', 'cm'), Nu('kang', 'Kink angle', 'degrees')]}; }
+  },
+  common: [Ps('conf', 'Confidence', 'conf'), Ar('notes', 'Notes')]};
+
+/* ---------- 5 Metamorphism (checklists, typed by protolith) ---------- */
+function metaDef(group, minerals, zones, extraCls) {
+  return function () { G(group); return {
+    cls: [Ck('event', 'Type of metamorphism', ['Regional', 'Contact', 'Dynamic (shear zone)', 'Retrograde', 'Hydrothermal', 'Burial']),
+      Ck('zone', 'Metamorphic zone or facies', zones), Ck('minerals', 'Minerals present', minerals),
+      Ck('texture', 'Texture', ['Granoblastic', 'Porphyroblastic', 'Lepidoblastic', 'Nematoblastic', 'Poikiloblastic', 'Porphyroclastic', 'Mylonitic', 'Decussate', 'Spotted']),
+      Ck('fabric', 'Fabric development', ['No foliation', 'Slaty cleavage', 'Phyllitic sheen', 'Schistosity', 'Gneissic banding', 'Lineation present', 'Crenulated']),
+      Ck('grain', 'Grain size', ['Very fine (under 0.1 mm)', 'Fine (0.1 to 0.75 mm)', 'Medium (0.75 to 1 mm)', 'Coarse (1 to 2 mm)', 'Very coarse (over 2 mm)']),
+      Ck('timing', 'Growth timing against foliation', ['Before foliation (pre-kinematic)', 'During foliation (syn-kinematic)', 'After foliation (post-kinematic)', 'Between phases (inter-kinematic)']),
+      Ck('incl', 'Inclusion trails in porphyroblasts', ['None seen', 'Straight', 'Curved', 'Sigmoidal', 'Spiral (helicitic)', 'Rotated']),
+      Ck('react', 'Reaction textures', ['Corona or rim', 'Symplectite', 'Pseudomorph', 'Replacement', 'Resorbed grains', 'Overgrowth', 'None seen']),
+      Ck('retro', 'Retrogression', ['None', 'Chloritization (of biotite or garnet)', 'Sericitization (of feldspar or kyanite)', 'Epidotization', 'Carbonatization', 'Serpentinization', 'Uralitization', 'Albitization'])].concat(extraCls || []),
+    meas: [Pl('fol', 'Foliation'), Ln('lin', 'Lineation'), Pl('layer', 'Compositional layering'), Nu('distthrust', 'Distance to nearest thrust', 'm'), Nu('distiso', 'Distance to zone boundary', 'm'),
+      Nu('porph', 'Largest porphyroblast size', 'mm'), Nu('porphpct', 'Porphyroblast abundance', 'percent')],
+    extra: [Ck('position', 'Structural position', ['Hanging wall of a thrust', 'Footwall of a thrust', 'Close to a thrust', 'Crossing a zone boundary (isograd)', 'Inverted metamorphic sequence', 'Normal metamorphic sequence']),
+      Tx('assem', 'Mineral assemblage, short')]}; };
+}
+SPEC.MT = {id: 'MT', title: 'Metamorphism', sub: 'Choose the rock group, then tick what you see', typed: true, typeKey: 'protolith', typeLabel: 'Rock group (protolith)', checklist: true,
+  photo: {label: 'Photos for metamorphism', prefix: function (stn) { return stnBase(stn) + '_mt'; }},
+  sample: {prefix: function (stn) { return stnBase(stn) + '_sm'; }, types: sampleTypes('Metamorphism', ['Oriented hand specimen', 'Thin section sample', 'Mineral separate', 'Hand specimen', 'Geochemistry sample', 'Geochronology sample'])},
+  types: {
+    'Pelitic rock (slate, phyllite, schist)': metaDef('Metamorphism: pelite', ['Quartz', 'Muscovite', 'Biotite', 'Chlorite', 'Garnet', 'Staurolite', 'Kyanite', 'Sillimanite', 'Andalusite', 'Chloritoid', 'Cordierite', 'Plagioclase', 'Tourmaline', 'Graphite', 'Epidote'],
+      ['Chlorite zone', 'Biotite zone', 'Garnet zone', 'Staurolite zone', 'Kyanite zone', 'Sillimanite zone', 'Greenschist facies', 'Amphibolite facies', 'Granulite facies']),
+    'Psammitic or quartzitic rock': metaDef('Metamorphism: psammite', ['Quartz', 'Muscovite', 'Biotite', 'Feldspar', 'Chlorite', 'Garnet', 'Epidote', 'Tourmaline', 'Sillimanite', 'Magnetite'],
+      ['Low grade (greenschist)', 'Medium grade (amphibolite)', 'High grade', 'Recrystallized quartz only']),
+    'Calcareous rock (marble, calc-silicate)': metaDef('Metamorphism: calcareous', ['Calcite', 'Dolomite', 'Quartz', 'Tremolite', 'Diopside', 'Wollastonite', 'Forsterite', 'Talc', 'Phlogopite', 'Grossular garnet', 'Scapolite', 'Epidote', 'Graphite'],
+      ['Calcite and dolomite only (low grade)', 'Tremolite zone', 'Diopside zone', 'Wollastonite zone', 'Forsterite zone']),
+    'Metabasic rock (greenschist, amphibolite)': metaDef('Metamorphism: metabasic', ['Actinolite', 'Chlorite', 'Epidote', 'Albite', 'Hornblende', 'Plagioclase', 'Garnet', 'Clinopyroxene', 'Biotite', 'Zoisite', 'Titanite', 'Quartz', 'Calcite'],
+      ['Greenschist facies', 'Epidote-amphibolite facies', 'Amphibolite facies', 'Granulite facies', 'Blueschist facies', 'Eclogite facies']),
+    'Felsic gneiss or orthogneiss': metaDef('Metamorphism: felsic gneiss', ['Quartz', 'K-feldspar', 'Plagioclase', 'Muscovite', 'Biotite', 'Garnet', 'Hornblende', 'Epidote', 'Sillimanite', 'Kyanite', 'Tourmaline'],
+      ['Greenschist facies', 'Amphibolite facies', 'Granulite facies', 'Migmatitic'])
+  },
+  common: [Ps('conf', 'Confidence', 'conf'), Ar('notes', 'Notes')]};
+
+/* ---------- 6 Mineralization ---------- */
+G('Mineralization');
+var hasWorking = function (v) { return v.old && v.old !== 'None'; };
+SPEC.MN = {id: 'MN', title: 'Mineralization', sub: 'One occurrence', typed: false,
+  code: {label: 'Occurrence code', make: function () { return 'Oc' + pad2(projectNumber('MN', 'code', /^Oc(\d+)$/) + 1); }},
+  photo: {label: 'Photos of the occurrence', prefix: function (stn) { return stnBase(stn) + '_Oc'; }},
+  sample: {prefix: function (stn, V) { return V.code + '_sm'; }, types: sampleTypes('Mineralization', ['Grab sample', 'Chip sample', 'Channel sample', 'Composite sample', 'Hand specimen', 'Oriented specimen', 'Gangue or vein sample', 'Altered host rock', 'Unaltered host rock (background)', 'Soil sample', 'Stream sediment sample'])},
+  fields: [
+    Tx('local', 'Local name or locality', {grp: 'Occurrence'}),
+    Ck('commodity', 'Commodity or target', ['Copper', 'Lead', 'Zinc', 'Iron', 'Gold', 'Silver', 'Cobalt', 'Nickel', 'Manganese', 'Tin', 'Tungsten', 'Molybdenum', 'Uranium', 'Rare earths', 'Graphite', 'Magnesite', 'Talc', 'Barite', 'Fluorite', 'Mica', 'Quartz (silica)', 'Limestone or dolomite'], {cap: true}),
+    Ck('style', 'Style of mineralization', ['Quartz vein', 'Stratabound', 'Disseminated', 'Massive sulphide', 'Stockwork', 'Breccia-hosted', 'Shear-hosted', 'Skarn', 'Replacement', 'Supergene or oxidised zone', 'Pocket or lens', 'Placer'], {cap: true}),
+    Ps('hostunit', 'Host unit', 'unit'), Ps('hostrock', 'Host rock', 'rock', {cap: true}),
+    Pk('hostrel', 'Position in the host', ['Within a single bed', 'Along bedding', 'Along foliation', 'Along a fracture or joint', 'Along a contact', 'At a fold hinge', 'Along a shear zone', 'Cross-cutting (discordant)']),
+    Ck('control', 'Structural control', ['Bedding', 'Foliation', 'Fracture', 'Contact', 'Fold hinge', 'Shear zone', 'Thrust or fault', 'Discordant']),
+    Pl('body', 'Orientation of the mineralized body', {grp: 'Geometry'}), Ln('shoot', 'Ore shoot plunge'),
+    Nu('len', 'Strike length', 'm'), Nu('wid', 'Width', 'm'), Nu('thk', 'Thickness', 'm'), Nu('ht', 'Exposed height', 'm'),
+    Ck('ore', 'Primary ore minerals', ['Chalcopyrite', 'Pyrite', 'Pyrrhotite', 'Galena', 'Sphalerite', 'Bornite', 'Chalcocite', 'Covellite', 'Arsenopyrite', 'Molybdenite', 'Hematite', 'Magnetite', 'Goethite'], {grp: 'Minerals and textures', cap: true}),
+    Ck('oxid', 'Surface and oxidation minerals', ['Malachite', 'Azurite', 'Limonite', 'Goethite', 'Chrysocolla', 'Cuprite', 'Cerussite', 'Smithsonite', 'Jarosite', 'Gossan']),
+    Ck('gangue', 'Gangue', ['Quartz', 'Calcite', 'Dolomite', 'Chlorite', 'Siderite', 'Barite', 'Fluorite', 'Tourmaline', 'Sericite', 'Graphite']),
+    Pk('abund', 'Visual abundance of ore minerals', ['Trace (under 1 percent)', '1 to 5 percent', '5 to 20 percent', '20 to 50 percent', 'Over 50 percent (massive)']),
+    Pk('oretex', 'Ore texture', ['Disseminated', 'Veinlet or stringer', 'Massive', 'Banded', 'Breccia infill', 'Replacement', 'Boudinaged']), Pk('oregrain', 'Ore grain size', ['Very fine', 'Fine', 'Medium', 'Coarse']),
+    Pk('gossan', 'Gossan or leached cap', ['Present', 'Absent', 'Not sure']), Pk('magnet', 'Response to hand magnet', ['None', 'Weak', 'Strong']),
+    Ck('alt', 'Alteration', ['Silicification', 'Chloritization', 'Sericitization', 'Carbonate alteration', 'Iron staining', 'Argillic alteration', 'Epidotization', 'Tourmalinization'], {grp: 'Alteration and timing'}),
+    Nu('altw', 'Alteration width', 'm', {when: function (v) { return v.alt && v.alt.length; }}),
+    Ck('timing', 'Timing evidence', ['Folded or boudinaged', 'Along foliation or in pressure shadow', 'Cuts foliation', 'Cuts folds', 'Replacement texture', 'Late oxidation']),
+    Pk('age', 'Relative age of mineralization', ['Before deformation', 'During deformation', 'After deformation', 'Supergene', 'Not clear']),
+    Nu('dist', 'Distance to nearest thrust, fault or contact', 'm'), Tx('nearbody', 'Nearby igneous or metabasic body (code)'),
+    Pk('old', 'Old working', ['None', 'Adit', 'Shaft', 'Trench or pit', 'Open cut', 'Dump only'], {grp: 'Old workings (do not enter)', drivesx: 1}),
+    Pk('wcond', 'Condition of the working', ['Open', 'Partly collapsed', 'Collapsed (blocked)', 'Flooded', 'Overgrown'], {when: hasWorking}),
+    Nu('wlen', 'Visible length', 'm', {when: hasWorking}), Ln('wdir', 'Direction of the working', {when: hasWorking}),
+    Ps('conf', 'Confidence', 'conf', {grp: 'Interpretation'}), Ar('interp', 'Interpretation and genesis notes')]};
+
+/* ---------- 7 Igneous body ---------- */
+G('Igneous body');
+var hasMet = function (v) { return v.metam && v.metam.indexOf('None') !== 0; };
+SPEC.IG = {id: 'IG', title: 'Igneous body', sub: 'One igneous or metaigneous body', typed: false,
+  code: {label: 'Body code', make: function (stn) { return stnBase(stn) + '_Ig' + (projectNumber('IG', 'code', /_Ig(\d+)$/) + 1); }},
+  photo: {label: 'Photos of the body', prefix: function (stn, V) { return V.code + '_ph'; }},
+  sample: {prefix: function (stn, V) { var m = /(Ig\d+)$/.exec(V.code || ''); return (m ? m[1] : 'Ig') + '_sm'; }, types: sampleTypes('Igneous body', ['Fresh interior', 'Other facies', 'Contact zone', 'Enclave', 'Oriented fabric sample', 'Dyke or vein', 'Host rock at the contact', 'Geochronology sample (zircon)', 'Geochemistry sample'])},
+  fields: [
+    Pk('igclass', 'Rock class', ['Plutonic (intrusive)', 'Hypabyssal (dyke or sill)', 'Volcanic (extrusive)', 'Metaigneous (metabasite or orthogneiss)', 'Vein type (pegmatite or aplite)'], {grp: 'Type and classification', cap: true}),
+    Pk('igcomp', 'Composition', ['Felsic', 'Intermediate', 'Mafic', 'Ultramafic'], {cap: true}),
+    Pk('igname', 'Rock name', ['Granite', 'Leucogranite', 'Tourmaline granite', 'Granodiorite', 'Tonalite', 'Syenite', 'Diorite', 'Gabbro', 'Dolerite (diabase)', 'Basalt', 'Andesite', 'Rhyolite', 'Pegmatite', 'Aplite', 'Lamprophyre', 'Peridotite', 'Orthogneiss', 'Augen gneiss', 'Amphibolite (metabasite)', 'Metagabbro'], {cap: true}),
+    Pk('cindex', 'Colour index', ['Leucocratic', 'Mesocratic', 'Melanocratic']),
+    Pk('igtext', 'Texture', ['Equigranular', 'Inequigranular', 'Porphyritic', 'Pegmatitic', 'Aphanitic', 'Glassy', 'Ophitic', 'Graphic', 'Foliated', 'Mylonitic', 'Vesicular']),
+    Pk('iggrain', 'Grain size', ['Very coarse (over 3 cm)', 'Coarse (5 mm to 3 cm)', 'Medium (1 to 5 mm)', 'Fine (under 1 mm)', 'Aphanitic']),
+    Ck('igmin', 'Main minerals', ['Quartz', 'K-feldspar', 'Plagioclase', 'Muscovite', 'Biotite', 'Hornblende', 'Pyroxene', 'Olivine', 'Tourmaline', 'Garnet', 'Magnetite', 'Epidote', 'Chlorite', 'Zircon (accessory)']),
+    Ck('igalt', 'Alteration or weathering', ['Fresh', 'Chloritization', 'Sericitization', 'Epidotization', 'Silicification', 'Kaolinization', 'Carbonatization', 'Weathered (grus)']),
+    Pk('encl', 'Enclaves or xenoliths', ['None', 'Few', 'Abundant']), Tx('encltype', 'Enclave type', {when: function (v) { return v.encl && v.encl !== 'None'; }}),
+    Pk('shape', 'Form of the body', ['Dyke', 'Sill', 'Stock or pluton', 'Sheet', 'Lens or pod', 'Irregular'], {grp: 'Size'}),
+    Nu('len', 'Length', 'm'), Nu('wid', 'Width or thickness', 'm'), Nu('ht', 'Exposed height', 'm'),
+    Pl('contactp', 'Contact plane', {grp: 'Orientation'}), Ln('axis', 'Long axis of the body'), Pl('fol', 'Internal foliation'), Ln('lin', 'Internal lineation'), Pl('layer', 'Magmatic layering'),
+    Ps('host', 'Host rock', 'rock', {grp: 'Host rock and contact'}), Ps('hostunit', 'Host unit', 'unit'),
+    Pk('hostdef', 'Host rock deformation', ['Undeformed', 'Weakly deformed', 'Strongly deformed', 'Mylonitic']), Pl('hostfol', 'Host foliation'),
+    Ck('cevid', 'Contact evidence', ['Sharp intrusive contact', 'Chilled margin', 'Apophyses or veins into host', 'Xenoliths of host', 'Gradational contact', 'Sheared (tectonic) contact', 'Concordant with foliation', 'Discordant to foliation']),
+    Pk('aureole', 'Contact metamorphism in the host', ['None seen', 'Hornfels', 'Spotted schist', 'Skarn', 'Other contact aureole']),
+    Nu('aureolew', 'Aureole width', 'm', {when: function (v) { return v.aureole && v.aureole !== 'None seen'; }}),
+    Ck('aureolemin', 'Minerals in the contact zone', ['Andalusite', 'Cordierite', 'Biotite', 'Garnet', 'Tourmaline', 'Diopside', 'Wollastonite', 'Epidote'], {when: function (v) { return v.aureole && v.aureole !== 'None seen'; }}),
+    Pk('timing', 'Timing against deformation', ['Before deformation (pre-kinematic)', 'During deformation (syn-kinematic)', 'After deformation (post-kinematic)', 'Not clear']),
+    Nu('distthrust', 'Distance to nearest thrust', 'm'),
+    Pk('metam', 'Metamorphism of the body', ['None (fresh igneous)', 'Low grade (greenschist)', 'Medium grade (amphibolite)', 'High grade', 'Contact metamorphism only', 'Dynamic (shear) only'], {grp: 'Metamorphism of the body'}),
+    Ck('metmin', 'Metamorphic minerals', ['Chlorite', 'Epidote', 'Actinolite', 'Hornblende', 'Biotite', 'Garnet', 'Muscovite or sericite', 'Albite', 'Titanite', 'Calcite'], {when: hasMet}),
+    Ck('metfab', 'Metamorphic fabric', ['Foliation', 'Lineation', 'Augen', 'Mylonitic fabric', 'Static recrystallization', 'Porphyroclasts'], {when: hasMet}),
+    Ck('retro', 'Retrograde overprint', ['None', 'Chloritization of biotite or hornblende', 'Sericitization of feldspar', 'Epidotization', 'Uralitization', 'Carbonatization'], {when: hasMet}),
+    Ps('conf', 'Confidence', 'conf', {grp: 'Interpretation'}), Ar('interp', 'Interpretation')]};
+
+/* ---------- 8 Fossils ---------- */
+G('Fossils');
+var ANIMAL = {
+  'Porifera (sponges)': ['Calcarea', 'Demospongiae', 'Hexactinellida', 'Stromatoporoidea'],
+  'Cnidaria (corals and relatives)': ['Rugose corals', 'Tabulate corals', 'Scleractinian corals', 'Hydrozoa'],
+  'Bryozoa': ['Stenolaemata', 'Gymnolaemata'],
+  'Brachiopoda': ['Articulata (hinged)', 'Inarticulata (unhinged)'],
+  'Mollusca': ['Bivalvia', 'Gastropoda', 'Cephalopoda: Ammonoidea', 'Cephalopoda: Nautiloidea', 'Cephalopoda: Belemnoidea', 'Scaphopoda'],
+  'Arthropoda': ['Trilobita', 'Crustacea', 'Eurypterida', 'Insecta'],
+  'Echinodermata': ['Crinoidea', 'Echinoidea', 'Asteroidea', 'Blastoidea'],
+  'Hemichordata (graptolites)': ['Graptolithina'],
+  'Chordata (vertebrates)': ['Fish', 'Amphibians', 'Reptiles', 'Birds', 'Mammals'],
+  'Trace fossils (ichnofossils)': ['Dwelling traces', 'Feeding traces', 'Grazing traces', 'Crawling traces and trackways', 'Resting traces', 'Escape traces', 'Boring traces']
+};
+var PLANT = {
+  'Algae and stromatolites': ['Cyanobacteria (stromatolites)', 'Green algae', 'Red algae', 'Charophytes', 'Calcareous algae'],
+  'Bryophytes': ['Mosses', 'Liverworts'],
+  'Pteridophytes': ['Lycopsids (club mosses)', 'Sphenopsids (horsetails)', 'Ferns'],
+  'Pteridosperms (seed ferns)': ['Glossopteridales (Gondwana flora)', 'Other seed ferns'],
+  'Gymnosperms': ['Cycads', 'Ginkgoes', 'Conifers', 'Cordaitales'],
+  'Angiosperms': ['Monocotyledons', 'Dicotyledons']
+};
+function regMap(group, map) { var out = {}; Object.keys(map).forEach(function (k) { out[k] = reg(group, k, map[k]); }); return out; }
+var ANIMAL_KEYS = regMap('Fossil animal classes', ANIMAL), PLANT_KEYS = regMap('Fossil plant classes', PLANT);
+var NOTMICRO = function (v) { return v.ftype !== 'Microfossil'; };
+SPEC.FS = {id: 'FS', title: 'Fossils', sub: 'Plant, animal or microfossil', typed: true, typeKey: 'ftype', typeLabel: 'Fossil group',
+  code: {label: 'Fossil code', make: function (stn) { return nextCode(stnBase(stn) + '_fs'); }},
+  photo: {label: 'Photos of the fossil', prefix: function (stn, V) { return V.code + '_ph'; }},
+  sample: {prefix: function (stn) { return stnBase(stn) + '_sfs'; }, types: sampleTypes('Fossils', ['Macrofossil specimen', 'Plant specimen', 'Microfossil bulk sample', 'Palynology sample', 'Thin section sample', 'Whole rock with fossils', 'Oriented slab'])},
+  types: {
+    'Plant fossil': function () { G('Fossils: plant'); return {
+      cls: [Ps('pdiv', 'Plant division', typeList('Fossils', 'Plant division list', PLANT), {cap: true}),
+        {k: 'pclass', label: 'Class or group', type: 'pick', cap: true, list: function (v) { return v.pdiv ? PLANT_KEYS[v.pdiv] || null : null; }},
+        Pk('porgan', 'Plant part', ['Leaf', 'Stem or axis', 'Root', 'Seed or fruit', 'Wood (petrified)', 'Cone or flower', 'Cuticle', 'Plant debris or coal']), Tx('pname', 'Genus or species, if known')],
+      meas: [Nu('plen', 'Leaf or organ length', 'cm'), Nu('pwid', 'Width', 'cm'), Nu('pdia', 'Stem or wood diameter', 'cm')]}; },
+    'Animal fossil': function () { G('Fossils: animal'); return {
+      cls: [Ps('aphylum', 'Phylum or group', typeList('Fossils', 'Animal phylum list', ANIMAL), {cap: true}),
+        {k: 'aclass', label: 'Class', type: 'pick', cap: true, list: function (v) { return v.aphylum ? ANIMAL_KEYS[v.aphylum] || null : null; }},
+        Tx('aname', 'Genus or species, if known'), Pk('apart', 'Fossil part', ['Whole body', 'Shell', 'Skeleton or bone', 'Tooth', 'Imprint or mould', 'Fragments'])],
+      meas: [Nu('alen', 'Length', 'cm'), Nu('awid', 'Width', 'cm'), Nu('acount', 'Number of specimens', '')]}; },
+    'Microfossil': function () { G('Fossils: microfossil'); return {
+      cls: [Pk('mgroup', 'Microfossil group', ['Foraminifera (benthic)', 'Foraminifera (planktonic)', 'Radiolaria', 'Diatoms', 'Calcareous nannofossils', 'Ostracods', 'Conodonts', 'Palynomorphs (pollen and spores)', 'Dinoflagellates and acritarchs', 'Chitinozoans', 'Sponge spicules'], {cap: true}),
+        Pk('mlitho', 'Suitability of the rock', ['Fine-grained shale or mudstone', 'Marl or limestone', 'Chert', 'Siltstone', 'Not ideal']),
+        Ck('mprep', 'Preparation needed', ['Thin section', 'Washing and sieving', 'Acid maceration', 'Palynological processing', 'Smear slide', 'Picking under microscope'])],
+      meas: [Nu('mmass', 'Bulk sample mass', 'kg'), Nu('mint', 'Interval sampled', 'cm')]}; }
+  },
+  common: [
+    Ps('hostrock', 'Host rock', 'rock', {grp: 'Position and horizon'}), Ps('hostunit', 'Host unit', 'unit'), Nu('height', 'Height above section base', 'm'), Tx('bed', 'Bed or horizon number'),
+    Pk('age', 'Probable age', ['Precambrian', 'Cambrian', 'Ordovician', 'Silurian', 'Devonian', 'Carboniferous', 'Permian', 'Triassic', 'Jurassic', 'Cretaceous', 'Paleogene', 'Neogene', 'Quaternary', 'Unknown']),
+    Pk('abund', 'Abundance', ['Rare (one or two)', 'Few', 'Common', 'Abundant', 'Rock-forming']), Pk('distrib', 'Distribution', ['Scattered', 'Concentrated in a layer', 'In lenses or pockets', 'Along a bedding surface', 'Within concretions']),
+    Pk('preserv', 'Preservation', ['Original shell or tissue', 'Mould', 'Cast', 'Impression', 'Compression (carbonized)', 'Permineralized (petrified)', 'Replaced by minerals', 'Trace fossil']),
+    Pk('complete', 'Completeness', ['Complete', 'Fragmentary', 'Broken or abraded']),
+    Pk('insitu', 'In place or transported', ['In life position', 'Transported or reworked', 'Not sure'], {when: NOTMICRO}),
+    Pk('orientpat', 'Orientation pattern', ['Random', 'Preferred (aligned)', 'Bimodal', 'Current-oriented'], {when: NOTMICRO, grp: 'Orientation, where applicable'}),
+    Ln('longaxis', 'Long axis of the fossil', {when: NOTMICRO}), Pl('fossbed', 'Bedding plane carrying the fossils', {when: NOTMICRO}),
+    Ps('conf', 'Confidence', 'conf', {grp: 'Notes'}), Ar('notes', 'Notes')]};
+
+/* ---------- 9 Hazards and disaster management ---------- */
+var SLOPEFACE = {types: ['Landslide', 'Rockfall', 'Debris flow', 'Gully or surface erosion', 'Slope creep or toppling', 'Earthquake effects']};
+SPEC.HZ = {id: 'HZ', title: 'Hazards and disaster', sub: 'Choose the hazard, then add details and risk information', typed: true, typeKey: 'htype', typeLabel: 'Hazard type', addAnother: true,
+  code: {label: 'Hazard code', make: function (stn) { return nextCode(stnBase(stn) + '_hz'); }},
+  photo: {label: 'Photos of the hazard', prefix: function (stn, V) { return V.code + '_ph'; }},
+  sample: {prefix: function (stn) { return stnBase(stn) + '_shz'; }, types: sampleTypes('Hazards', ['Rock sample', 'Soil sample (disturbed)', 'Soil sample (undisturbed)', 'Sediment sample', 'Water sample'])},
+  types: {
+    'Landslide': function () { G('Hazard: landslide'); return {
+      cls: [Pk('lmove', 'Type of movement', ['Rotational slide', 'Translational slide', 'Rock slide', 'Debris slide', 'Earth flow', 'Complex or compound', 'Creep']), Pk('lmat', 'Material', ['Bedrock', 'Debris', 'Soil or earth', 'Colluvium']),
+        Pk('lrate', 'Rate of movement', ['Extremely slow', 'Very slow', 'Slow', 'Moderate', 'Rapid']), Pk('lcrown', 'Crown or scarp', ['Fresh scarp', 'Old scarp', 'Tension cracks above the scarp', 'Not visible'])],
+      meas: [Pl('scarp', 'Main scarp plane'), Ln('move', 'Movement direction'), Pl('discont', 'Critical discontinuity'), Nu('len', 'Length', 'm'), Nu('wid', 'Width', 'm'), Nu('depth', 'Estimated depth', 'm'),
+        Nu('vol', 'Estimated volume', 'cubic metres'), Nu('scarpht', 'Scarp height', 'm'), Nu('runout', 'Runout distance', 'm')]}; },
+    'Rockfall': function () { G('Hazard: rockfall'); return {
+      cls: [Pk('rsource', 'Source', ['Cliff or rock face', 'Road cut', 'Quarry', 'Natural slope']), Ck('rcontrol', 'Controlled by', ['Joint sets', 'Bedding', 'Foliation', 'Fault', 'Weathering']),
+        Pk('rfreq', 'Frequency', ['Rare', 'Occasional', 'Frequent', 'Continuous'])],
+      meas: [Pl('rjoint', 'Controlling discontinuity'), Ln('path', 'Fall path'), Nu('block', 'Typical block size', 'm'), Nu('maxblock', 'Largest block', 'm'), Nu('src', 'Source height', 'm'), Nu('rrun', 'Runout distance', 'm')]}; },
+    'Debris flow': function () { G('Hazard: debris flow'); return {
+      cls: [Pk('dtype', 'Type', ['Debris flow', 'Debris flood', 'Mudflow', 'Channelised flow']), Pk('dsource', 'Source area', ['Landslide in the catchment', 'Gully head', 'Moraine material', 'Loose slope debris']),
+        Pk('dfreq', 'Recurrence', ['Every year', 'Every few years', 'Rare', 'Unknown'])],
+      meas: [Ln('flowdir', 'Flow direction'), Nu('chgrad', 'Channel gradient', 'degrees'), Nu('chwidth', 'Channel width', 'm'), Nu('depth', 'Deposit thickness', 'm'), Nu('vol', 'Estimated volume', 'cubic metres'), Nu('boulder', 'Largest boulder', 'm')]}; },
+    'Flood and bank erosion': function () { G('Hazard: flood'); return {
+      cls: [Pk('ftype', 'Type', ['River flooding', 'Flash flood', 'Bank erosion', 'Channel shifting', 'Sediment build-up (aggradation)', 'Waterlogging']), Pk('fcause', 'Cause', ['Monsoon rain', 'Cloudburst', 'Landslide dam', 'Glacial lake outburst', 'Blocked drain'])],
+      meas: [Ln('flow', 'Flow direction'), Nu('hwm', 'High water mark above bed', 'm'), Nu('chw', 'Channel width', 'm'), Nu('bank', 'Bank height', 'm'), Nu('erosion', 'Bank retreat', 'm')]}; },
+    'Gully or surface erosion': function () { G('Hazard: erosion'); return {
+      cls: [Pk('etype', 'Type', ['Gully erosion', 'Sheet erosion', 'Rill erosion', 'Badland', 'Piping']), Pk('emat', 'Material', ['Soil', 'Colluvium', 'Weathered rock', 'Alluvium'])],
+      meas: [Ln('gdir', 'Gully direction'), Nu('gdepth', 'Gully depth', 'm'), Nu('gwid', 'Gully width', 'm'), Nu('glen', 'Gully length', 'm')]}; },
+    'Active fault or surface rupture': function () { G('Hazard: active fault'); return {
+      cls: [Pk('aftype', 'Feature', ['Fault scarp', 'Offset stream', 'Sag pond', 'Linear ridge or trench', 'Triangular facet', 'Surface rupture', 'Offset terrace']),
+        Pk('afkin', 'Kinematics', ['Normal', 'Reverse or thrust', 'Dextral strike-slip', 'Sinistral strike-slip', 'Oblique'])],
+      meas: [Pl('afplane', 'Fault plane'), Ln('afslip', 'Slip direction'), Nu('scarpht', 'Scarp height', 'm'), Nu('offset', 'Offset', 'm'), Nu('aflen', 'Length followed', 'm')]}; },
+    'Earthquake effects': function () { G('Hazard: earthquake effects'); return {
+      cls: [Pk('eqtype', 'Effect', ['Ground cracks', 'Liquefaction (sand boils)', 'Triggered landslide or rockfall', 'Damaged buildings', 'Lateral spreading', 'Settlement']), Tx('eqevent', 'Earthquake name and year')],
+      meas: [Ln('crackdir', 'Crack direction'), Nu('crackw', 'Crack width', 'cm'), Nu('crackl', 'Crack length', 'm'), Nu('subs', 'Settlement', 'cm')]}; },
+    'Slope creep or toppling': function () { G('Hazard: creep and toppling'); return {
+      cls: [Pk('ctype', 'Type', ['Soil creep', 'Block toppling', 'Flexural toppling', 'Bulging slope', 'Tilted trees, poles or walls'])],
+      meas: [Pl('cdisc', 'Controlling discontinuity'), Nu('tilt', 'Tilt of trees, poles or walls', 'degrees'), Nu('crack', 'Crack width', 'cm'), Nu('cmove', 'Estimated movement', 'cm')]}; },
+    'Sinkhole or karst subsidence': function () { G('Hazard: sinkhole'); return {
+      cls: [Pk('sktype', 'Type', ['Sinkhole (doline)', 'Subsidence', 'Cave collapse', 'Spring-fed pit']), Pk('skmat', 'Material', ['Limestone', 'Dolomite', 'Gypsum', 'Alluvium'])],
+      meas: [Pl('skjoint', 'Controlling joint set'), Nu('sdia', 'Diameter', 'm'), Nu('sdepth', 'Depth', 'm')]}; },
+    'Glacial or high altitude hazard': function () { G('Hazard: high altitude'); return {
+      cls: [Pk('gtype', 'Type', ['Glacial lake outburst flood (GLOF)', 'Avalanche', 'Moraine instability', 'Permafrost slope', 'Ice fall'])],
+      meas: [Nu('gelev', 'Elevation', 'm'), Nu('glake', 'Lake size', 'm'), Nu('gslope', 'Slope angle', 'degrees')]}; },
+    'Old mine or adit hazard': function () { G('Hazard: old mine'); return {
+      cls: [Pk('mtype', 'Feature', ['Open adit', 'Collapsed adit', 'Shaft', 'Open pit or trench', 'Dump instability', 'Subsidence above workings', 'Water seep or acid drainage']), Pk('maccess', 'Access', ['Open to people or animals', 'Fenced', 'Blocked'])],
+      meas: [Ln('mdir', 'Direction of the workings'), Nu('mdim', 'Opening size', 'm'), Nu('mdist', 'Distance to settlement', 'm')]}; }
+  },
+  common: [
+    Pk('activity', 'Activity', ['Active', 'Reactivated', 'Dormant', 'Stabilised', 'Relict (old)'], {grp: 'Setting'}),
+    Ck('trigger', 'Triggering factors', ['Heavy rainfall', 'Earthquake', 'River undercutting', 'Road cutting or toe excavation', 'Deforestation', 'Over-irrigation or leakage', 'Snowmelt', 'Mining or quarrying', 'Freeze and thaw']),
+    Ck('geofactor', 'Geological and slope factors', ['Weak or weathered rock', 'Discontinuities dipping out of the slope', 'Thick soil or colluvium', 'Spring or seepage', 'Steep slope', 'Shear zone or fault nearby', 'Soft or clay-rich layer', 'Highly jointed rock']),
+    Pl('slopeface', 'Slope face', {types: SLOPEFACE.types}), Nu('slopeang', 'Slope angle', 'degrees', {types: SLOPEFACE.types}), Nu('slopeht', 'Slope height', 'm', {types: SLOPEFACE.types}),
+    Pk('rating', 'Hazard level', ['Low', 'Moderate', 'High', 'Very high'], {grp: 'Risk and disaster management', cap: true}),
+    Ck('exposed', 'Elements at risk', ['Houses', 'Road', 'Bridge', 'Farmland', 'School or health post', 'Water source', 'Hydropower or canal', 'Power or telecom line', 'Temple or public space', 'Livestock shed']),
+    Nu('hh', 'Households exposed', 'number'), Pk('vuln', 'Vulnerability', ['Low', 'Moderate', 'High']),
+    Pk('history', 'Past events', ['None known', 'Reported by villagers', 'Documented', 'Recurrent']), Tx('year', 'Year or date of past events', {when: function (v) { return v.history && v.history !== 'None known'; }}),
+    Ck('mit', 'Mitigation seen or recommended', ['Retaining wall', 'Surface drainage', 'Bioengineering (plants)', 'Slope cutting or benching', 'Check dams', 'Gabion or river training', 'Early warning system', 'Relocation of settlement', 'Monitoring (crack meter or markers)', 'Land use restriction']),
+    Pk('urgency', 'Action priority', ['Immediate', 'Within one year', 'Monitor only']), Ar('notes', 'Notes')]};
+
+/* ---------- 10 Other geological studies ---------- */
+SPEC.OT = {id: 'OT', title: 'Other geological studies', sub: 'Isotopes, geochemistry, water, geomorphology, industrial rock and more', typed: true, typeKey: 'otype', typeLabel: 'Study type',
+  photo: {label: 'Photos', prefix: function (stn) { return stnBase(stn) + '_ot'; }},
+  sample: {prefix: function (stn) { return stnBase(stn) + '_sm'; }, types: sampleTypes('Other studies', ['Isotope sample', 'Geochemistry sample', 'Geochronology sample', 'Water sample', 'Soil sample', 'Stream sediment sample', 'Industrial rock sample', 'Hand specimen'])},
+  types: {
+    'Isotope sampling': function () { G('Other: isotope sampling'); return {
+      cls: [Pk('itype', 'Sample type', ['Carbonate (oxygen and carbon)', 'Quartz vein (oxygen)', 'Silicate (whole rock or mineral)', 'Sulphide (sulphur)', 'Water (hydrogen and oxygen)']),
+        Ck('iq', 'Question to answer', ['Fluid source', 'Temperature', 'Fluid-rock interaction', 'Protolith', 'Provenance', 'Diagenesis']), Pk('veingen', 'Vein generation', ['Early vein', 'Late vein', 'Not applicable']),
+        Pk('irel', 'Relation to fabric', ['Along foliation', 'Cuts foliation', 'Folded']), Pk('ifresh', 'Fresh material', ['Yes', 'No']), Pk('lab', 'Laboratory needs confirmed', ['Yes', 'No'])],
+      meas: [Pl('vein', 'Vein plane'), Nu('imass', 'Sample mass', 'g')]}; },
+    'Geochemical sampling': function () { G('Other: geochemical sampling'); return {
+      cls: [Pk('gmed', 'Medium', ['Rock chip', 'Soil (B horizon)', 'Soil (C horizon)', 'Stream sediment', 'Panned concentrate', 'Water']), Pk('gpurp', 'Purpose', ['Background', 'Anomaly follow-up', 'Regional survey', 'Lithogeochemistry'])],
+      meas: [Nu('depth', 'Sampling depth', 'cm'), Nu('sieve', 'Sieve size', 'mesh'), Nu('gmass', 'Sample mass', 'kg'), Nu('spacing', 'Sample spacing', 'm')]}; },
+    'Geochronology sampling': function () { G('Other: geochronology'); return {
+      cls: [Pk('gmin', 'Mineral target', ['Zircon', 'Monazite', 'Muscovite or biotite (Ar-Ar)', 'Garnet (Sm-Nd or Lu-Hf)', 'Titanite', 'Whole rock (Rb-Sr)', 'Detrital zircon (sandstone)']),
+        Pk('gq', 'Age question', ['Age of intrusion', 'Age of metamorphism', 'Age of deformation', 'Age of mineralization', 'Maximum depositional age'])],
+      meas: [Pl('fol', 'Foliation or fabric'), Nu('gcmass', 'Sample mass', 'kg')]}; },
+    'Water point or spring': function () { G('Other: water point'); return {
+      cls: [Pk('wtype', 'Type', ['Spring', 'Seepage', 'Stream', 'Tapped spring or well', 'Hot spring']), Pk('wflow', 'Flow', ['Dry', 'Trickle', 'Moderate', 'Strong']), Pk('wuse', 'Use', ['Drinking', 'Irrigation', 'Hydropower', 'None']),
+        Ck('wctrl', 'Geological control', ['Fault or thrust', 'Contact', 'Joint', 'Bedding plane', 'Karst', 'Landslide toe'])],
+      meas: [Nu('wq', 'Discharge', 'litres per minute'), Nu('wt', 'Temperature', 'degrees C'), Nu('wph', 'pH', ''), Nu('wec', 'Conductivity', 'microsiemens'), Nu('welev', 'Elevation', 'm')]}; },
+    'Geomorphic feature': function () { G('Other: geomorphic feature'); return {
+      cls: [Pk('gtype', 'Feature', ['River terrace', 'Alluvial fan', 'Landslide terrace', 'Moraine', 'Waterfall or knickpoint', 'Wind gap', 'Gorge', 'Karst feature']), Pk('gage', 'Relative age', ['Active', 'Young', 'Old'])],
+      meas: [Ln('gdir', 'Orientation or trend'), Nu('gh', 'Height above the river', 'm'), Nu('gwid', 'Width', 'm'), Nu('gelev', 'Elevation', 'm')]}; },
+    'Industrial rock and construction material': function () { G('Other: industrial rock'); return {
+      cls: [Pk('mat', 'Material', ['Dolomite', 'Limestone', 'Quartzite (silica)', 'Slate', 'Marble (dimension stone)', 'Sand and gravel', 'Clay', 'Building stone', 'Talc', 'Magnesite', 'Mica']),
+        Pk('mq', 'Visual quality', ['Good', 'Moderate', 'Poor']), Ck('muse', 'Possible use', ['Agricultural lime', 'Cement or lime', 'Dimension stone', 'Roofing slate', 'Aggregate', 'Industrial filler', 'Refractory']),
+        Pk('maccess', 'Access to the site', ['Roadside', 'Short walk', 'Remote'])],
+      meas: [Pl('mbed', 'Bedding or jointing'), Nu('mlen', 'Exposure length', 'm'), Nu('mwid', 'Width', 'm'), Nu('mthk', 'Thickness', 'm'), Nu('mjoint', 'Joint spacing', 'cm'), Nu('mroad', 'Distance to road', 'm')]}; },
+    'Paleocurrent measurement': function () { G('Other: paleocurrent'); return {
+      cls: [Pk('ptype', 'Indicator', ['Cross bedding', 'Ripple marks', 'Flute or groove marks', 'Imbricated clasts', 'Channel axis', 'Fossil orientation'])],
+      meas: [Ln('pdir', 'Current direction'), Pl('pbed', 'Bedding'), Nu('pn', 'Number of readings', '')]}; },
+    'Soil and weathering profile': function () { G('Other: soil profile'); return {
+      cls: [Pk('sltype', 'Profile', ['Residual soil', 'Colluvium', 'Alluvium', 'Saprolite', 'Laterite']), Pk('sldrain', 'Drainage', ['Good', 'Moderate', 'Poor'])],
+      meas: [Nu('sthk', 'Soil thickness', 'cm'), Nu('shor', 'Depth of weathered rock', 'cm')]}; },
+    'Field note': function () { G('Other: field note'); return {cls: [Tx('topic', 'Topic')], meas: []}; }
+  },
+  common: [Ar('notes', 'Notes')]};
+
+/* ---------- finish: resolve the lazy type definitions and register type lists ---------- */
+Object.keys(SPEC).forEach(function (id) {
+  var sp = SPEC[id];
+  sp.id = id;
+  if (sp.typed) {
+    var resolved = {}; Object.keys(sp.types).forEach(function (n) { var d = sp.types[n]; resolved[n] = typeof d === 'function' ? d() : d; });
+    sp.types = resolved; sp.typeListKey = reg('Type lists', sp.title, Object.keys(resolved));
+  }
+  if (sp.sample) { sp.sampleKey = sp.sample.types; }
+});
+/* ---------- GPS ---------- */
+function setFix(p) {
+  S.fix = {lat: p.coords.latitude, lon: p.coords.longitude, alt: p.coords.altitude, acc: p.coords.accuracy, t: Date.now()};
+  updateStatus();
+}
+function getFix() {
+  return new Promise(function (res, rej) {
+    if (!navigator.geolocation) { rej(new Error('GPS is not available in this browser.')); return; }
+    navigator.geolocation.getCurrentPosition(function (p) { setFix(p); res(S.fix); }, function (e) {
+      rej(new Error(e.code === 1 ? 'Location is blocked. Allow location for this site in the browser settings.' : 'No GPS fix yet. Move outdoors and try again.'));
+    }, {enableHighAccuracy: true, timeout: 25000, maximumAge: 0});
+  });
+}
+function toggleWatch() {
+  if (S.watch !== null) { navigator.geolocation.clearWatch(S.watch); S.watch = null; updateStatus(); toast('GPS tracking stopped'); return; }
+  if (!navigator.geolocation) { toast('GPS is not available in this browser.', true); return; }
+  S.watch = navigator.geolocation.watchPosition(setFix, function () { toast('GPS error. Check location permission.', true); },
+    {enableHighAccuracy: true, maximumAge: 2000, timeout: 30000});
+  updateStatus(); toast('GPS tracking on');
+}
+
+/* ---------- compass and clinometer ---------- */
+var hasAbs = 'ondeviceorientationabsolute' in window;
+var Sens = {on: false, last: null, offset: null, abs: false, listeners: []};
+function onOri(e) {
+  if (e.alpha === null || e.alpha === undefined) return;
+  var a = e.alpha, absolute = false;
+  if (typeof e.webkitCompassHeading === 'number') {
+    if (Math.abs(e.beta) < 25 && Math.abs(e.gamma) < 25) Sens.offset = norm360((360 - e.webkitCompassHeading) - e.alpha);
+    if (Sens.offset !== null) { a = norm360(e.alpha + Sens.offset); absolute = true; }
+  } else if (hasAbs || e.absolute === true) absolute = true;
+  Sens.abs = absolute;
+  Sens.last = {a: a, b: e.beta, g: e.gamma, t: Date.now()};
+  Sens.listeners.forEach(function (fn) { fn(Sens.last); });
+}
+function startSensors() {
+  if (Sens.on) return Promise.resolve(true);
+  var ask = Promise.resolve('granted');
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') ask = DeviceOrientationEvent.requestPermission();
+  return ask.then(function (r) {
+    if (r !== 'granted') { toast('Motion and orientation access was denied.', true); return false; }
+    window.addEventListener(hasAbs ? 'deviceorientationabsolute' : 'deviceorientation', onOri, true);
+    Sens.on = true; return true;
+  }).catch(function () { toast('Could not start the sensors. Use HTTPS and allow motion access.', true); return false; });
+}
+function axes(a, b, g) {
+  var d = Math.PI / 180; a *= d; b *= d; g *= d;
+  var ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b), cg = Math.cos(g), sg = Math.sin(g);
+  return {y: [-sa * cb, ca * cb, sb], z: [ca * sg + sa * sb * cg, sa * sg - ca * sb * cg, cb * cg]};
+}
+function azOf(v) { return norm360(Math.atan2(v[0], v[1]) * 180 / Math.PI + Number(S.settings.decl || 0)); }
+function measure(o, mode) {
+  var ax = axes(o.a, o.b, o.g), v;
+  if (mode === 'plane') {
+    v = ax.z.slice(); if (v[2] < 0) v = v.map(function (x) { return -x; });
+    var dip = Math.acos(clamp(v[2], -1, 1)) * 180 / Math.PI;
+    return {a: dip < 0.5 ? null : azOf(v), b: dip};
+  }
+  v = ax.y.slice(); if (v[2] > 0) v = v.map(function (x) { return -x; });
+  return {a: azOf(v), b: Math.asin(clamp(-v[2], -1, 1)) * 180 / Math.PI};
+}
+function heading(o) {
+  var ax = axes(o.a, o.b, o.g);
+  return Math.abs(ax.z[2]) > 0.7 ? azOf(ax.y) : azOf(ax.z.map(function (x) { return -x; }));
+}
+function circMean(arr) {
+  var s = 0, c = 0; arr.forEach(function (x) { s += Math.sin(x * Math.PI / 180); c += Math.cos(x * Math.PI / 180); });
+  return norm360(Math.atan2(s, c) * 180 / Math.PI);
+}
+function angDiff(a, b) { var d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; }
+function sensorNote() {
+  if (!window.isSecureContext) return 'This page is not on HTTPS, so the sensors will not work.';
+  if (Sens.on && !Sens.abs) return 'No north reference yet. iPhone: hold the phone flat on a table for two seconds, then continue. Android: use Chrome.';
+  return '';
+}
+function openMeasure(mode, onUse) {
+  startSensors().then(function (ok) {
+    if (!ok) return;
+    var cap = null, listener;
+    var title = mode === 'plane' ? 'Measure a plane' : 'Measure a line';
+    var how = mode === 'plane' ? 'Lay the back of the phone flat on the surface. The reading is dip direction and dip.'
+      : 'Lay the long edge of the phone along the line. The reading is trend and plunge, taken in the downward direction.';
+    var la = el('span', {class: 'num'}, '---'), lb = el('span', {class: 'num'}, '---');
+    var capOut = el('p', {class: 'num', style: 'margin:8px 0;font-size:18px'}, 'Not captured yet');
+    var warn = el('p', {class: 'warn'}, sensorNote());
+    var useBtn = el('button', {type: 'button', class: 'btn dark', disabled: 'disabled'}, 'Use this reading');
+    var capBtn = el('button', {type: 'button', class: 'btn pri'}, 'Hold 1 second and capture');
+    var close = function () { var i = Sens.listeners.indexOf(listener); if (i > -1) Sens.listeners.splice(i, 1); if (modal.parentNode) modal.parentNode.removeChild(modal); };
+    listener = function (o) {
+      var m = measure(o, mode);
+      la.textContent = m.a === null ? 'flat' : Math.round(m.a) + ' deg'; lb.textContent = Math.round(m.b) + ' deg';
+      var n = sensorNote(); if (warn.textContent !== n && !(Sens.last && Date.now() - Sens.last.t < 0)) warn.textContent = n;
+    };
+    Sens.listeners.push(listener);
+    capBtn.onclick = function () {
+      var samples = []; capBtn.disabled = true; capBtn.textContent = 'Hold still...';
+      var grab = function (o) { samples.push(measure(o, mode)); };
+      Sens.listeners.push(grab);
+      setTimeout(function () {
+        var i = Sens.listeners.indexOf(grab); if (i > -1) Sens.listeners.splice(i, 1);
+        capBtn.disabled = false; capBtn.textContent = 'Hold 1 second and capture';
+        var good = samples.filter(function (s) { return s.a !== null; });
+        if (good.length < 3) { capOut.textContent = 'No usable sensor data. Check permission, and that the phone is not lying flat for a plane reading.'; return; }
+        var A = circMean(good.map(function (s) { return s.a; }));
+        var B = good.reduce(function (t, s) { return t + s.b; }, 0) / good.length;
+        var spread = Math.max.apply(null, good.map(function (s) { return angDiff(s.a, A); }));
+        cap = {a: Math.round(A), b: Math.round(B)};
+        capOut.textContent = 'Captured: ' + cap.a + ' / ' + cap.b + '  (spread ' + Math.round(spread) + ' deg)' + (spread > 6 ? '  Unsteady, retry' : '');
+        useBtn.removeAttribute('disabled');
+      }, 1200);
+    };
+    useBtn.onclick = function () { if (cap) { onUse(cap.a, cap.b); close(); } };
+    var modal = el('div', {class: 'modal'}, el('div', {class: 'sheet'}, [
+      el('h2', {style: 'font-size:18px'}, title), el('p', {class: 'hint'}, how),
+      el('div', {class: 'row', style: 'margin:6px 0'}, [
+        el('div', {}, [el('div', {class: 'lbl'}, mode === 'plane' ? 'Dip direction' : 'Trend'), el('div', {class: 'read'}, la)]),
+        el('div', {}, [el('div', {class: 'lbl'}, mode === 'plane' ? 'Dip' : 'Plunge'), el('div', {class: 'read'}, lb)])]),
+      warn, capOut,
+      el('div', {class: 'bar'}, [capBtn, useBtn, el('button', {type: 'button', class: 'btn', onclick: close}, 'Close')])]));
+    document.body.appendChild(modal);
+    setTimeout(function () { if (!Sens.last) warn.textContent = 'No sensor data yet. Allow motion access, use HTTPS, and use a phone (computers have no compass).'; }, 2500);
+  });
+}
+
+/* ---------- searchable pick lists, always with full words ---------- */
+function score(it, q) {
+  if (!q) return 1;
+  var n = it.n.toLowerCase(), c = (it.c || '').toLowerCase();
+  if (c === q || n === q) return 100;
+  if (n.indexOf(q) === 0 || (c && c.indexOf(q) === 0)) return 60;
+  var words = n.split(/[\s,()\-:]+/), i;
+  for (i = 0; i < words.length; i++) if (words[i].indexOf(q) === 0) return 40;
+  if (n.indexOf(q) > -1) return 20;
+  if (c && c.indexOf(q) > -1) return 10;
+  return 0;
+}
+function openPicker(o) {
+  var sel = o.selected.slice(), q = '', modal;
+  var search = el('input', {type: 'search', placeholder: 'Type a word or short code to search', autocomplete: 'off', autocapitalize: 'off', 'aria-label': 'Search the list'});
+  var list = el('div', {class: 'plist'});
+  var nIn = el('input', {type: 'text', placeholder: 'New item, full words', autocomplete: 'off'}), cIn = el('input', {type: 'text', placeholder: 'Short code (optional)', autocomplete: 'off'});
+  function finish(v) { if (modal.parentNode) modal.parentNode.removeChild(modal); o.onDone(v); }
+  function choose(name) {
+    if (o.multi) { var i = sel.indexOf(name); if (i > -1) sel.splice(i, 1); else sel.push(name); paint(); }
+    else finish([name]);
+  }
+  function addNew(name, code) {
+    var it = addCatalogItem(o.key, name, code); if (!it) return;
+    toast('Added to the list: ' + it.n);
+    if (o.multi) { if (sel.indexOf(it.n) < 0) sel.push(it.n); nIn.value = ''; cIn.value = ''; search.value = ''; q = ''; paint(); } else finish([it.n]);
+  }
+  function paint() {
+    list.innerHTML = '';
+    var rows = catItems(o.key).map(function (it, i) { return {it: it, s: score(it, q), i: i}; }).filter(function (r) { return r.s > 0; })
+      .sort(function (a, b) { return b.s - a.s || a.i - b.i; });
+    rows.forEach(function (r) {
+      var on = sel.indexOf(r.it.n) > -1;
+      list.appendChild(el('button', {type: 'button', class: 'prow', 'aria-pressed': on ? 'true' : 'false', onclick: function () { choose(r.it.n); }},
+        [el('span', {class: 'tick'}, on ? '\u2713' : ''), el('span', {class: 'pn'}, r.it.n), r.it.c ? el('span', {class: 'pc'}, r.it.c) : null]));
+    });
+    if (!rows.length) list.appendChild(el('p', {class: 'hint', style: 'padding:8px'}, q ? 'Nothing matches. Add it below.' : 'This list is empty. Add your first item below.'));
+    var qq = search.value.trim();
+    if (qq && !catItems(o.key).some(function (it) { return it.n.toLowerCase() === qq.toLowerCase(); }))
+      list.appendChild(el('button', {type: 'button', class: 'prow add', onclick: function () { addNew(qq.charAt(0).toUpperCase() + qq.slice(1), ''); }}, '+ Add \u201c' + qq + '\u201d to this list'));
+  }
+  search.oninput = function () { q = search.value.trim().toLowerCase(); paint(); };
+  var det = el('details', {class: 'addbox'}, [el('summary', {}, 'Add your own item to this list'), nIn, cIn,
+    el('button', {type: 'button', class: 'btn dark', onclick: function () { addNew(nIn.value, cIn.value); }}, 'Add to list')]);
+  modal = el('div', {class: 'modal'}, el('div', {class: 'sheet tall'}, [
+    el('div', {class: 'sh-head'}, [el('h2', {}, o.title), o.multi ? el('button', {type: 'button', class: 'btn pri sm', onclick: function () { finish(sel); }}, 'Done') :
+      el('button', {type: 'button', class: 'btn sm', onclick: function () { if (modal.parentNode) modal.parentNode.removeChild(modal); }}, 'Close')]),
+    search, list, det]));
+  document.body.appendChild(modal); paint();
+  setTimeout(function () { search.focus(); }, 60);
+}
+function listControl(label, key, multi, init, cb) {
+  var sel = [].concat(init || []).filter(function (x) { return x !== '' && x !== undefined; }).map(String);
+  var wrap = el('div', {});
+  function value() { return multi ? sel.slice() : (sel[0] || ''); }
+  function changed() { if (cb) cb(value()); }
+  function paint() {
+    wrap.innerHTML = '';
+    var items = catItems(key);
+    if (items.length <= 3 && key === 'yesno' || items.length <= 3 && !multi) {
+      var box = el('div', {class: 'chips'});
+      items.forEach(function (it) {
+        var on = sel.indexOf(it.n) > -1;
+        box.appendChild(el('button', {type: 'button', class: 'chip', 'aria-pressed': on ? 'true' : 'false', onclick: function () {
+          var i = sel.indexOf(it.n); if (multi) { if (i > -1) sel.splice(i, 1); else sel.push(it.n); } else sel = i > -1 ? [] : [it.n]; paint(); changed();
+        }}, it.n));
+      });
+      if (key !== 'yesno') box.appendChild(el('button', {type: 'button', class: 'chip plus', onclick: function () {
+        ask('Add to list', label + ': new item (full words)', '', 'Add').then(function (v) { if (v) { var it = addCatalogItem(key, v, ''); if (it) { if (multi) sel.push(it.n); else sel = [it.n]; } paint(); changed(); } });
+      }}, '+ Add'));
+      wrap.appendChild(box);
+    } else {
+      var txt = sel.length ? sel.join(', ') : 'Choose';
+      var b = el('button', {type: 'button', class: 'pickbtn' + (sel.length ? '' : ' empty'), onclick: function () {
+        openPicker({title: label, key: key, multi: multi, selected: sel, onDone: function (v) { sel = v; paint(); changed(); }});
+      }}, [el('span', {class: 'pv'}, txt), el('span', {class: 'caret'}, '\u25be')]);
+      wrap.appendChild(b);
+      if (sel.length) wrap.appendChild(el('button', {type: 'button', class: 'clr', onclick: function () { sel = []; paint(); changed(); }}, 'Clear'));
+    }
+  }
+  paint();
+  return {node: wrap, get: value};
+}
+/* checklist: every item visible with a tick box */
+function checkControl(label, key, init, cb) {
+  var sel = [].concat(init || []).filter(Boolean).map(String), wrap = el('div', {});
+  function paint() {
+    wrap.innerHTML = '';
+    var grid = el('div', {class: 'checks'});
+    catItems(key).forEach(function (it) {
+      var inp = el('input', {type: 'checkbox'}); inp.checked = sel.indexOf(it.n) > -1;
+      inp.onchange = function () { var i = sel.indexOf(it.n); if (inp.checked && i < 0) sel.push(it.n); if (!inp.checked && i > -1) sel.splice(i, 1); lab.className = 'chk' + (inp.checked ? ' on' : ''); if (cb) cb(sel.slice()); };
+      var lab = el('label', {class: 'chk' + (inp.checked ? ' on' : '')}, [inp, el('span', {}, it.n)]);
+      grid.appendChild(lab);
+    });
+    wrap.appendChild(grid);
+    wrap.appendChild(el('button', {type: 'button', class: 'clr', onclick: function () {
+      ask('Add to list', label + ': new item (full words)', '', 'Add').then(function (v) { if (v) { var it = addCatalogItem(key, v, ''); if (it) sel.push(it.n); paint(); if (cb) cb(sel.slice()); } });
+    }}, '+ Add an item to this list'));
+  }
+  paint();
+  return {node: wrap, get: function () { return sel.slice(); }};
+}
+
+/* ---------- form fields ---------- */
+function numVal(inp) { return inp.value === '' ? '' : Number(inp.value); }
+function buildField(f, rec, opts) {
+  var wrap = el('div', {class: 'f'}), get, v = rec ? rec[f.k] : undefined;
+  if (f.type !== 'gps' && f.type !== 'orient') wrap.appendChild(el('label', {}, f.label));
+  if (f.type === 'text' || f.type === 'date' || f.type === 'num') {
+    var inp = el('input', {type: f.type === 'num' ? 'number' : f.type === 'date' ? 'date' : 'text', step: f.type === 'num' ? 'any' : null, inputmode: f.type === 'num' ? 'decimal' : null, autocomplete: 'off'});
+    if (v !== undefined) inp.value = v; else if (f.auto) inp.value = autoValue(f.auto);
+    wrap.appendChild(inp); get = function () { var o = {}; o[f.k] = f.type === 'num' ? numVal(inp) : inp.value.trim(); return o; };
+    if (f.k === 'stn') wrap.appendChild(el('p', {class: 'hint', style: 'margin:3px 0 0'}, 'Made automatically for this project. Change it only if you must.'));
+    if (f.k === 'sample') wrap.appendChild(el('p', {class: 'hint', style: 'margin:3px 0 0'}, 'Numbered by station: the next one is made for you.'));
+  } else if (f.type === 'area') {
+    var ta = el('textarea', {}); if (v !== undefined) ta.value = v; else if (f.auto) ta.value = autoValue(f.auto);
+    wrap.appendChild(ta); get = function () { var o = {}; o[f.k] = ta.value.trim(); return o; };
+  } else if (f.type === 'check') {
+    var cc = checkControl(f.label, f.list, v); wrap.appendChild(cc.node); get = function () { var o = {}; o[f.k] = cc.get(); return o; };
+  } else if (f.type === 'pick' || f.type === 'multi') {
+    var c = listControl(f.label, f.list, f.type === 'multi', v); wrap.appendChild(c.node);
+    get = function () { var o = {}; o[f.k] = c.get(); return o; };
+  } else if (f.type === 'gps') {
+    wrap.appendChild(el('div', {class: 'lbl'}, f.label));
+    var names = ['Latitude', 'Longitude', 'Elevation (m)', 'Accuracy (m)'], ins = f.keys.map(function (k, i) {
+      var x = el('input', {type: 'number', step: 'any', inputmode: 'decimal', 'aria-label': names[i]}); if (rec && rec[k] !== undefined) x.value = rec[k]; return x;
+    });
+    var fill = function () {
+      var x = S.fix; if (!x) return;
+      ins[0].value = x.lat.toFixed(6); ins[1].value = x.lon.toFixed(6);
+      ins[2].value = x.alt === null || x.alt === undefined ? '' : Math.round(x.alt); ins[3].value = Math.round(x.acc);
+    };
+    if (!rec && S.fix && Date.now() - S.fix.t < 90000) fill();
+    var gb = el('button', {type: 'button', class: 'btn dark'}, 'Use phone GPS');
+    gb.onclick = function () { gb.disabled = true; gb.textContent = 'Getting fix...'; getFix().then(function () { fill(); toast('GPS point filled'); }).catch(function (e) { toast(e.message, true); }).then(function () { gb.disabled = false; gb.textContent = 'Use phone GPS'; }); };
+    wrap.appendChild(el('div', {class: 'row'}, ins.map(function (x, i) { return el('div', {}, [el('div', {class: 'hint', style: 'margin:0'}, names[i]), x]); })));
+    wrap.appendChild(el('div', {class: 'tool'}, gb));
+    get = function () { var o = {}; f.keys.forEach(function (k, i) { o[k] = numVal(ins[i]); }); return o; };
+  } else if (f.type === 'orient') {
+    wrap.appendChild(el('div', {class: 'lbl'}, f.label));
+    var oi = f.keys.map(function (k) { var x = el('input', {type: 'number', step: 'any', inputmode: 'decimal'}); if (rec && rec[k] !== undefined) x.value = rec[k]; return x; });
+    wrap.appendChild(el('div', {class: 'row'}, oi.map(function (x, i) { return el('div', {}, [el('div', {class: 'hint', style: 'margin:0'}, f.labels[i]), x]); })));
+    wrap.appendChild(el('div', {class: 'tool bar'}, f.modes.map(function (m) {
+      return el('button', {type: 'button', class: 'btn sm', onclick: function () {
+        openMeasure(m, function (a, b) { oi[0].value = a; oi[1].value = b; toast('Reading filled: ' + a + ' / ' + b); });
+      }}, m === 'plane' ? 'Measure plane with phone' : 'Measure line with phone');
+    })));
+    get = function () { var o = {}; f.keys.forEach(function (k, i) { o[k] = numVal(oi[i]); }); return o; };
+  }
+  return {node: wrap, get: get};
+}
+/* a form object: node plus save(); the view decides which buttons to show */
+function makeForm(sheet, rec, opts) {
+  opts = opts || {};
+  var sc = SHEETS[sheet], parts = sc.fields.map(function (f) { return buildField(f, rec, opts); });
+  var node = el('div', {}); parts.forEach(function (p) { node.appendChild(p.node); });
+  function save() {
+    var vals = {}; parts.forEach(function (p) { Object.assign(vals, p.get()); });
+    var stn = sc.nostn ? '' : (sheet === 'S0' ? vals.stn : (opts.stn || (rec && rec.stn)));
+    if (!sc.nostn && !stn) { toast('Station code is missing.', true); return Promise.resolve(null); }
+    if (sheet === 'S0' && !rec && stationSaved(stn)) { toast('Station ' + stn + ' already exists in this project.', true); return Promise.resolve(null); }
+    var r = rec ? Object.assign({}, rec, vals, {updated: nowStr()})
+      : Object.assign({id: uid(), sheet: sheet, project: proj(), created: nowStr(), geologist: S.settings.geologist, stn: stn}, vals);
+    if (!sc.nostn) r.stn = stn;
+    return dbPut('records', r).then(function () {
+      if (rec) S.records = S.records.map(function (x) { return x.id === r.id ? r : x; }); else S.records.push(r);
+      if (sheet === 'S0' && !rec) { flow().stn = r.stn; saveSettings(); }
+      return r;
+    }).catch(function () { toast('Could not save. The browser may be blocking storage (private mode).', true); return null; });
+  }
+  return {node: node, save: save};
+}
+
+/* =====================================================================
+   Entry engine: one form for every typed or untyped entry
+   ===================================================================== */
+function trimv(v) { return String(v).replace(/\s*\([^)]*\)/g, '').trim(); }
+function shortLabel(l) { return trimv(l).toLowerCase(); }
+function hasVal(v) { return v !== '' && v !== undefined && v !== null && !(Array.isArray(v) && !v.length); }
+function descr(f, V) {
+  if (f.type === 'orient') { var a = V[f.keys[0]], b = V[f.keys[1]]; return hasVal(a) && hasVal(b) ? shortLabel(f.label) + ' ' + Math.round(a) + '/' + Math.round(b) : ''; }
+  var v = V[f.k]; if (!hasVal(v)) return '';
+  if (f.type === 'num') return shortLabel(f.label) + ' ' + v + (f.unit ? (f.unit === 'degrees' ? ' deg' : ' ' + f.unit) : '');
+  if (Array.isArray(v)) return v.slice(0, 2).map(trimv).join(' and ');
+  return trimv(v);
+}
+function specFields(spec, V) {   /* ordered list of {f, title} that apply to the current type */
+  var out = [];
+  if (spec.typed) {
+    var def = spec.types[V[spec.typeKey]] || {cls: [], meas: [], extra: []};
+    (def.cls || []).forEach(function (f) { out.push({f: f, title: 'Classification'}); });
+    (def.meas || []).forEach(function (f) { out.push({f: f, title: 'Measurements'}); });
+    (def.extra || []).forEach(function (f) { out.push({f: f, title: 'Other details'}); });
+    var last = 'Details';
+    (spec.common || []).forEach(function (f) { if (f.grp) last = f.grp; out.push({f: f, title: last}); });
+  } else {
+    var t = 'Details';
+    spec.fields.forEach(function (f) { if (f.grp) t = f.grp; out.push({f: f, title: t}); });
+  }
+  return out.filter(function (x) { return !(x.f.types && x.f.types.indexOf(V[spec.typeKey]) < 0); });
+}
+function captionFor(spec, V) {
+  var items = specFields(spec, V), cls = [], meas = [];
+  items.forEach(function (x) {
+    var f = x.f, d = descr(f, V); if (!d) return;
+    if (x.title === 'Measurements' || f.type === 'orient' || f.type === 'num') meas.push(d); else if (spec.typed ? (x.title === 'Classification' || f.cap) : f.cap) cls.push(d);
+  });
+  if (spec.typed) {
+    var t = V[spec.typeKey] || spec.title;
+    return trimv(t) + (cls.length ? ': ' + cls.slice(0, 3).join(', ') : '') + (meas.length ? (cls.length ? '; ' : ': ') + meas.slice(0, 4).join(', ') : '') + '.';
+  }
+  var all = cls.concat(meas.filter(function (m) { return /^(bedding|body|orientation)/.test(m); })).slice(0, 6);
+  return spec.title + (all.length ? ': ' + all.join(', ') : '') + '.';
+}
+function sampleCaption(spec, V, s) {
+  var ctx = spec.typed ? trimv(V[spec.typeKey] || spec.title).toLowerCase() : spec.title.toLowerCase();
+  var an = (s.analyses || []).slice(0, 3).map(trimv).join(', ');
+  return s.code + ': ' + (s.type ? trimv(s.type).toLowerCase() : 'sample') + (s.oriented === 'Yes' ? ' (oriented' + (hasVal(s.ori_dd) ? ' ' + Math.round(s.ori_dd) + '/' + Math.round(s.ori_da) : '') + ')' : '') +
+    (s.what ? ', ' + s.what : '') + ' from ' + ctx + (an ? '; for ' + an : '') + '.';
+}
+function photoUrl(id) {
+  if (S.objUrls[id]) return S.objUrls[id];
+  var p = S.photos.filter(function (x) { return x.id === id; })[0]; if (!p) return '';
+  return (S.objUrls[id] = URL.createObjectURL(p.blob));
+}
+function clearKeys(f, V) { (f.keys || [f.k]).forEach(function (k) { delete V[k]; }); }
+
+/* one field control; state is a plain object, refresh() re-draws the form */
+function fieldNode(f, V, refresh) {
+  var wrap = el('div', {class: 'f'});
+  var listKey = typeof f.list === 'function' ? f.list(V) : f.list;
+  if (f.type !== 'orient') wrap.appendChild(el('label', {}, f.label));
+  if (f.type === 'text' || f.type === 'num' || f.type === 'date') {
+    var inp = el('input', {type: f.type === 'num' ? 'number' : f.type === 'date' ? 'date' : 'text', step: f.type === 'num' ? 'any' : null, inputmode: f.type === 'num' ? 'decimal' : null, autocomplete: 'off'});
+    if (hasVal(V[f.k])) inp.value = V[f.k];
+    inp.oninput = function () { V[f.k] = f.type === 'num' ? (inp.value === '' ? '' : Number(inp.value)) : inp.value; };
+    wrap.appendChild(inp);
+  } else if (f.type === 'area') {
+    var ta = el('textarea', {}); if (hasVal(V[f.k])) ta.value = V[f.k]; ta.oninput = function () { V[f.k] = ta.value; }; wrap.appendChild(ta);
+  } else if (f.type === 'pick' || f.type === 'multi') {
+    wrap.appendChild(listControl(f.label, listKey, f.type === 'multi', V[f.k], function (v) { V[f.k] = v; refresh(); }).node);
+  } else if (f.type === 'check') {
+    wrap.appendChild(checkControl(f.label, listKey, V[f.k], function (v) { V[f.k] = v; refresh(); }).node);
+  } else if (f.type === 'orient') {
+    wrap.className = 'f ori';
+    wrap.appendChild(el('label', {}, f.label));
+    var ins = f.keys.map(function (k, i) {
+      var x = el('input', {type: 'number', step: 'any', inputmode: 'decimal', placeholder: f.ph[i], 'aria-label': f.label + ': ' + f.labels[i]});
+      if (hasVal(V[k])) x.value = V[k]; x.oninput = function () { V[k] = x.value === '' ? '' : Number(x.value); }; return x;
+    });
+    var mb = el('button', {type: 'button', class: 'btn sm measure', onclick: function () {
+      openMeasure(f.mode, function (a, b) { ins[0].value = a; ins[1].value = b; V[f.keys[0]] = a; V[f.keys[1]] = b; toast(f.label + ': ' + a + ' / ' + b); });
+    }}, 'Measure');
+    wrap.appendChild(el('div', {class: 'orow'}, [ins[0], ins[1], mb]));
+  }
+  return wrap;
+}
+function stubNode(f, note) { return el('div', {class: 'f off'}, [el('label', {}, f.label), el('div', {class: 'offtxt'}, note || 'Not needed here')]); }
+
+function openSampleForm(spec, stn, V, onAdd) {
+  var SV = {oriented: 'No'}, modal;
+  var prefix = spec.sample.prefix(stn, V), code = nextCode(prefix, V.samples.map(function (s) { return s.code; }));
+  var fields = [
+    Ps('type', 'Sample type', spec.sample.types), Ps('oriented', 'Oriented sample', 'yesno'),
+    Pl('ori', 'Orientation marked on the sample', {when: function (v) { return v.oriented === 'Yes'; }}),
+    Tx('what', 'Material or short description'),
+    Nu('interval', 'Sampled length or interval', 'm', {when: function (v) { return /channel|chip|composite/i.test(v.type || ''); }}),
+    Nu('mass', 'Approximate mass', 'kg'), Pk('condition', 'Condition', ['Fresh', 'Slightly weathered', 'Weathered']), Cs('analyses', 'Analyses planned', 'analyses'), Tx('notes', 'Notes')];
+  var body = el('div', {});
+  function draw() {
+    body.innerHTML = '';
+    fields.forEach(function (f) {
+      if (f.when && !f.when(SV)) { clearKeys(f, SV); body.appendChild(stubNode(f)); return; }
+      body.appendChild(fieldNode(f, SV, draw));
+    });
+  }
+  draw();
+  var close = function () { if (modal.parentNode) modal.parentNode.removeChild(modal); };
+  modal = el('div', {class: 'modal'}, el('div', {class: 'sheet tall'}, [
+    el('div', {class: 'sh-head'}, [el('div', {}, [el('div', {class: 'hint', style: 'margin:0'}, 'New sample'), el('div', {class: 'bigcode small'}, code)]), el('button', {type: 'button', class: 'btn sm', onclick: close}, 'Close')]),
+    el('div', {class: 'scroll'}, body),
+    el('div', {class: 'bar'}, [el('button', {type: 'button', class: 'btn pri', onclick: function () {
+      var s = Object.assign({code: code}, SV); s.caption = sampleCaption(spec, V, s); onAdd(s); close();
+    }}, 'Add sample ' + code)])]));
+  document.body.appendChild(modal);
+}
+
+function entryEditor(specId, rec, stn) {
+  var spec = SPEC[specId];
+  var V = rec ? JSON.parse(JSON.stringify(rec)) : {id: uid(), photos: [], samples: []};
+  V.photos = V.photos || []; V.samples = V.samples || [];
+  if (!rec && spec.code) V.code = spec.code.make(stn);
+  var node = el('div', {class: 'entry'}), photoList, sampleList;
+  function typeKey() { return spec.typeKey; }
+  function noType() { return spec.typed && !V[spec.typeKey]; }
+  function hasContent() {
+    if (V.photos.length || V.samples.length) return true;
+    if (spec.typed) return !!V[spec.typeKey];
+    return specFields(spec, V).some(function (x) { return !x.f.auto && hasVal(x.f.keys ? V[x.f.keys[0]] : V[x.f.k]); });
+  }
+  function draw() {
+    node.innerHTML = '';
+    if (spec.code) node.appendChild(el('div', {class: 'codechip'}, [el('span', {}, spec.code.label), el('b', {}, V.code)]));
+    if (spec.typed) {
+      node.appendChild(el('div', {class: 'f'}, [el('label', {}, spec.typeLabel),
+        listControl(spec.typeLabel, spec.typeListKey, false, V[spec.typeKey], function (v) {
+          var old = spec.types[V[spec.typeKey]]; if (old) ['cls', 'meas', 'extra'].forEach(function (g) { (old[g] || []).forEach(function (f) { clearKeys(f, V); }); });
+          V[spec.typeKey] = v; draw();
+        }).node]));
+    }
+    if (noType()) {
+      node.appendChild(el('div', {class: 'offnote'}, 'Choose the ' + spec.typeLabel.toLowerCase() + ' first. Its classification and measurements will appear here.'));
+    } else {
+      var lastTitle = '';
+      specFields(spec, V).forEach(function (x) {
+        var f = x.f;
+        if (x.title !== lastTitle) { node.appendChild(el('h3', {class: 'sech'}, x.title)); lastTitle = x.title; }
+        var key = typeof f.list === 'function' ? f.list(V) : f.list;
+        if ((typeof f.list === 'function' && !key) || (f.when && !f.when(V))) {
+          clearKeys(f, V); node.appendChild(stubNode(f, typeof f.list === 'function' && !key ? 'Choose the group above first' : 'Not needed here')); return;
+        }
+        node.appendChild(fieldNode(f, V, draw));
+      });
+    }
+    node.appendChild(photosSection());
+    if (spec.sample) node.appendChild(samplesSection());
+  }
+  function photosSection() {
+    var sec = el('section', {class: 'sec' + (noType() ? ' off' : '')}, [el('h3', {class: 'sech'}, spec.photo.label)]);
+    photoList = el('div', {class: 'pitems'}); sec.appendChild(photoList);
+    function paint() {
+      photoList.innerHTML = '';
+      V.photos.forEach(function (p, i) {
+        var cap = el('textarea', {rows: '2'}); cap.value = p.caption || ''; cap.oninput = function () { p.caption = cap.value; };
+        photoList.appendChild(el('div', {class: 'pitem'}, [el('img', {src: photoUrl(p.id), alt: p.name}),
+          el('div', {class: 'pbody'}, [el('b', {}, p.name), cap, el('div', {class: 'lk'}, [
+            el('button', {type: 'button', class: 'clr', onclick: function () { p.caption = captionFor(spec, V); paint(); }}, 'New caption from entry'),
+            el('button', {type: 'button', class: 'clr bad', onclick: function () {
+              if (!confirm('Remove ' + p.name + '?')) return;
+              dbDel('photos', p.id).then(function () { S.photos = S.photos.filter(function (x) { return x.id !== p.id; }); V.photos.splice(i, 1); updateStatus(); paint(); });
+            }}, 'Remove')])])]));
+      });
+    }
+    var ctxFn = function () { return {stn: stn, prefix: spec.photo.prefix(stn, V), caption: captionFor(spec, V), entry: V.id, tab: spec.id, subject: spec.photo.label, sample: '',
+      onAdded: function (p) { V.photos.push({id: p.id, name: p.name, caption: p.caption}); paint(); }}; };
+    var libIn = el('input', {type: 'file', accept: 'image/*', multiple: 'multiple', style: 'display:none'});
+    libIn.onchange = function () {
+      var files = [].slice.call(libIn.files); libIn.value = '';
+      files.reduce(function (pr, fl) { return pr.then(function () { return fileToPhoto(fl, ctxFn()); }); }, Promise.resolve()).catch(function () { toast('Could not read that image.', true); });
+    };
+    sec.appendChild(el('div', {class: 'bar'}, [
+      el('button', {type: 'button', class: 'btn dark', onclick: function () { if (noType()) { toast('Choose the type first.', true); return; } openCamera(ctxFn, paint); }}, 'Take photo'),
+      el('button', {type: 'button', class: 'btn', onclick: function () { if (noType()) { toast('Choose the type first.', true); return; } libIn.click(); }}, 'From library')]));
+    sec.appendChild(libIn); paint(); return sec;
+  }
+  function samplesSection() {
+    var sec = el('section', {class: 'sec' + (noType() ? ' off' : '')}, [el('h3', {class: 'sech'}, 'Samples')]);
+    sampleList = el('div', {class: 'sitems'}); sec.appendChild(sampleList);
+    function paint() {
+      sampleList.innerHTML = '';
+      V.samples.forEach(function (s, i) {
+        sampleList.appendChild(el('div', {class: 'sitem'}, [el('div', {}, [el('b', {}, s.code), el('div', {class: 'hint', style: 'margin:2px 0 0'}, s.caption || '')]),
+          el('button', {type: 'button', class: 'clr bad', onclick: function () { V.samples.splice(i, 1); paint(); }}, 'Remove')]));
+      });
+    }
+    sec.appendChild(el('div', {class: 'bar'}, [el('button', {type: 'button', class: 'btn', onclick: function () {
+      if (noType()) { toast('Choose the type first.', true); return; }
+      openSampleForm(spec, stn, V, function (s) { V.samples.push(s); paint(); });
+    }}, 'Add sample (code made automatically)')]));
+    paint(); return sec;
+  }
+  function save() {
+    if (spec.typed && !V[spec.typeKey]) { toast('Choose the ' + spec.typeLabel.toLowerCase() + ' first.', true); return Promise.resolve(null); }
+    var r = Object.assign({}, V, {sheet: spec.id, project: proj(), stn: stn, geologist: S.settings.geologist});
+    if (rec) { r.created = rec.created; r.updated = nowStr(); } else r.created = nowStr();
+    r.caption = captionFor(spec, V);
+    r.photos = V.photos.map(function (p) { return {id: p.id, name: p.name, caption: p.caption}; });
+    V.photos.forEach(function (p) { var ph = S.photos.filter(function (x) { return x.id === p.id; })[0]; if (ph) { ph.caption = p.caption; ph.entryType = r.caption; dbPut('photos', ph); } });
+    return dbPut('records', r).then(function () {
+      if (rec) S.records = S.records.map(function (x) { return x.id === r.id ? r : x; }); else S.records.push(r);
+      return r;
+    }).catch(function () { toast('Could not save. The browser may be blocking storage.', true); return null; });
+  }
+  draw();
+  return {node: node, save: save, hasContent: hasContent};
+}
+
+/* ---------- photos ---------- */
+function freshFix() { return S.fix && Date.now() - S.fix.t < 300000 ? S.fix : null; }
+function metaNow(name, ctx) {
+  var f = freshFix(), h = Sens.last && Date.now() - Sens.last.t < 4000 && Sens.abs ? heading(Sens.last) : null;
+  return {name: name, project: proj(), stn: ctx.stn, subject: ctx.subject, caption: ctx.caption, sample: ctx.sample, entry: ctx.entry || '', tab: ctx.tab || '', time: nowStr(),
+    lat: f ? f.lat : '', lon: f ? f.lon : '', acc: f ? f.acc : '', heading: h === null ? '' : Math.round(h)};
+}
+function stamp(x, w, h, m) {
+  var fs = Math.max(12, Math.round(w / 55)), lines = [m.name + '   ' + m.stn + '   ' + m.time,
+    m.lat !== '' ? Number(m.lat).toFixed(5) + ' N  ' + Number(m.lon).toFixed(5) + ' E   +/- ' + Math.round(m.acc) + ' m' : 'No GPS fix',
+    (m.heading !== '' ? 'Facing ' + m.heading + ' deg   ' : '') + (m.subject || '')];
+  var bh = fs * 1.35 * lines.length + fs * 0.6;
+  x.fillStyle = 'rgba(0,0,0,0.55)'; x.fillRect(0, h - bh, w, bh);
+  x.fillStyle = '#fff'; x.font = fs + 'px monospace'; x.textBaseline = 'top';
+  lines.forEach(function (t, i) { x.fillText(t, fs * 0.5, h - bh + fs * 0.3 + i * fs * 1.35); });
+}
+function makeBlob(sw, sh, draw, meta) {
+  var sc = Math.min(1, 1600 / Math.max(sw, sh)), c = document.createElement('canvas');
+  c.width = Math.round(sw * sc); c.height = Math.round(sh * sc);
+  var x = c.getContext('2d'); draw(x, c.width, c.height);
+  if (S.settings.stamp) stamp(x, c.width, c.height, meta);
+  return new Promise(function (res) { c.toBlob(res, 'image/jpeg', 0.85); });
+}
+function addPhoto(blob, meta) {
+  var p = Object.assign({id: uid(), blob: blob, size: blob.size}, meta);
+  return dbPut('photos', p).then(function () { S.photos.push(p); updateStatus(); return p; });
+}
+function fileToPhoto(file, ctx) {
+  var meta = metaNow(ctx.prefix ? nextCode(ctx.prefix) : nextPhoto(ctx.stn), ctx);
+  var load = window.createImageBitmap ? createImageBitmap(file) : new Promise(function (res, rej) {
+    var im = new Image(); im.onload = function () { res(im); }; im.onerror = rej; im.src = URL.createObjectURL(file);
+  });
+  return load.then(function (img) {
+    return makeBlob(img.width, img.height, function (x, cw, ch) { x.drawImage(img, 0, 0, cw, ch); }, meta);
+  }).then(function (b) { return addPhoto(b, meta); }).then(function (p) { if (ctx.onAdded) ctx.onAdded(p); return p; });
+}
+function openCamera(readCtx, done) {
+  startSensors();
+  var gpsAsk = freshFix() ? Promise.resolve() : getFix().catch(function () {});
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast('Live camera is not available here. Use the phone camera button.', true); return; }
+  navigator.mediaDevices.getUserMedia({video: {facingMode: {ideal: 'environment'}, width: {ideal: 1920}, height: {ideal: 1080}}, audio: false}).then(function (stream) {
+    var video = el('video', {playsinline: 'true', autoplay: 'true', muted: 'true'}); video.srcObject = stream; video.muted = true;
+    var ov = el('div', {class: 'camov'}, 'Camera'), count = 0;
+    var lis = function (o) { ov.textContent = (Sens.abs ? 'Facing ' + Math.round(heading(o)) + ' deg' : 'No north reference') + (freshFix() ? '   GPS +/- ' + Math.round(S.fix.acc) + ' m' : '   No GPS yet'); };
+    Sens.listeners.push(lis);
+    var shot = el('button', {type: 'button', class: 'btn pri', style: 'flex:2'}, 'Take photo');
+    var close = function () {
+      stream.getTracks().forEach(function (t) { t.stop(); });
+      var i = Sens.listeners.indexOf(lis); if (i > -1) Sens.listeners.splice(i, 1);
+      if (modal.parentNode) modal.parentNode.removeChild(modal); done();
+    };
+    shot.onclick = function () {
+      var ctx = readCtx(), meta = metaNow(ctx.prefix ? nextCode(ctx.prefix) : nextPhoto(ctx.stn), ctx), w = video.videoWidth, h = video.videoHeight;
+      if (!w) { toast('Camera is not ready yet.', true); return; }
+      makeBlob(w, h, function (x, cw, ch) { x.drawImage(video, 0, 0, cw, ch); }, meta).then(function (b) { return addPhoto(b, meta); })
+        .then(function (p) { count++; if (ctx.onAdded) ctx.onAdded(p); toast('Saved ' + p.name + '  (' + count + ' this time)'); });
+    };
+    var doneBtn = el('button', {type: 'button', class: 'btn', style: 'flex:1', onclick: close}, 'Done');
+    var modal = el('div', {class: 'modal'}, el('div', {class: 'sheet cam'}, [
+      el('div', {style: 'position:relative'}, [video, ov]), el('div', {class: 'bar', style: 'padding:10px'}, [shot, doneBtn])]));
+    document.body.appendChild(modal);
+    gpsAsk.then(function () { lis(Sens.last || {a: 0, b: 0, g: 0}); });
+  }).catch(function () { toast('Camera was blocked or is not available. Use the phone camera button.', true); });
+}
+function sampleCodes(stn) {
+  var out = []; S.records.forEach(function (r) { if (r.project === proj() && r.stn === stn && r.sample && out.indexOf(r.sample) < 0) out.push(r.sample); });
+  return out;
+}
+function viewPhoto() {
+  var pane = el('div', {class: 'pane'}), f = flow();
+  var subj = listControl('Photo subject', 'photosubject', false, 'Overview');
+  var smp = el('select', {}, [el('option', {value: ''}, 'No sample')].concat(sampleCodes(f.stn).map(function (c) { return el('option', {value: c}, c); })));
+  var cap = el('input', {type: 'text', placeholder: 'optional caption', autocomplete: 'off'});
+  var readCtx = function () { return {stn: flow().stn, subject: subj.get() || 'Other', caption: cap.value.trim(), sample: smp.value}; };
+  var gallery = el('div', {class: 'photos'});
+  var camIn = el('input', {type: 'file', accept: 'image/*', capture: 'environment', style: 'display:none'});
+  var galIn = el('input', {type: 'file', accept: 'image/*', multiple: 'multiple', style: 'display:none'});
+  var onFiles = function (inp) {
+    var ctx = readCtx(), files = [].slice.call(inp.files); inp.value = '';
+    files.reduce(function (p, fl) { return p.then(function () { return fileToPhoto(fl, ctx); }); }, Promise.resolve())
+      .then(function () { toast('Saved ' + files.length + ' photo' + (files.length > 1 ? 's' : '')); paint(); }).catch(function () { toast('Could not read that image.', true); });
+  };
+  camIn.onchange = function () { onFiles(camIn); }; galIn.onchange = function () { onFiles(galIn); };
+  var showAll = false;
+  function paint() {
+    gallery.innerHTML = '';
+    var list = projPhotos().filter(function (p) { return showAll || p.stn === flow().stn; });
+    if (!list.length) { gallery.appendChild(el('p', {class: 'hint'}, showAll ? 'No photos in this project yet.' : 'No photos for ' + flow().stn + ' yet. Four per key outcrop: overview, contact or structure, close up, close up with scale and north arrow.')); return; }
+    list.slice().reverse().forEach(function (p) {
+      var url = S.objUrls[p.id] || (S.objUrls[p.id] = URL.createObjectURL(p.blob));
+      gallery.appendChild(el('div', {class: 'ph'}, [el('img', {src: url, alt: p.name}),
+        el('div', {}, [el('b', {}, p.name), el('br'), p.subject + (p.heading !== '' ? ', facing ' + p.heading : ''), p.caption ? el('br') : null, p.caption || null]),
+        el('div', {class: 'bar', style: 'padding:0 6px 8px'}, [
+          el('button', {type: 'button', class: 'btn sm', onclick: function () { download(p.blob, p.name + '.jpg'); }}, 'Save'),
+          el('button', {type: 'button', class: 'btn sm danger', onclick: function () {
+            if (!confirm('Delete ' + p.name + '?')) return;
+            dbDel('photos', p.id).then(function () { S.photos = S.photos.filter(function (x) { return x.id !== p.id; }); URL.revokeObjectURL(S.objUrls[p.id]); delete S.objUrls[p.id]; paint(); updateStatus(); });
+          }}, 'Delete')])]));
+    });
+  }
+  pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, 'Photos for ' + f.stn),
+    el('p', {class: 'hint'}, 'Named automatically: ' + stnBase(f.stn) + '_ph1, ' + stnBase(f.stn) + '_ph2 and so on. Position, facing and time are stamped on each photo.'),
+    el('div', {class: 'f'}, [el('label', {}, 'Subject'), subj.node]),
+    el('div', {class: 'row'}, [el('div', {}, [el('label', {class: 'lbl'}, 'Sample'), smp]), el('div', {}, [el('label', {class: 'lbl'}, 'Caption'), cap])]),
+    el('div', {class: 'bar'}, [
+      el('button', {type: 'button', class: 'btn pri', onclick: function () { openCamera(readCtx, paint); }}, 'Open camera'),
+      el('button', {type: 'button', class: 'btn', onclick: function () { camIn.click(); }}, 'Phone camera app'),
+      el('button', {type: 'button', class: 'btn', onclick: function () { galIn.click(); }}, 'From photo library')]), camIn, galIn]));
+  var sw = el('div', {class: 'chips', style: 'margin:0 0 8px'}, [
+    el('button', {type: 'button', class: 'chip', 'aria-pressed': 'true'}, 'This station'), el('button', {type: 'button', class: 'chip', 'aria-pressed': 'false'}, 'Whole project')]);
+  sw.children[0].onclick = function () { showAll = false; sw.children[0].setAttribute('aria-pressed', 'true'); sw.children[1].setAttribute('aria-pressed', 'false'); paint(); };
+  sw.children[1].onclick = function () { showAll = true; sw.children[0].setAttribute('aria-pressed', 'false'); sw.children[1].setAttribute('aria-pressed', 'true'); paint(); };
+  pane.appendChild(sw); pane.appendChild(gallery); paint(); return pane;
+}
+
+/* ---------- compass tab ---------- */
+function ticks() { var o = '', i, a, l; for (i = 0; i < 36; i++) { a = i * 10 * Math.PI / 180; l = i % 9 === 0 ? 14 : (i % 3 === 0 ? 10 : 6); o += '<line x1="' + (115 + 104 * Math.sin(a)).toFixed(1) + '" y1="' + (115 - 104 * Math.cos(a)).toFixed(1) + '" x2="' + (115 + (104 - l) * Math.sin(a)).toFixed(1) + '" y2="' + (115 - (104 - l) * Math.cos(a)).toFixed(1) + '"/>'; } return o; }
+function viewCompass() {
+  var pane = el('div', {class: 'pane'}), rose = el('div', {});
+  rose.innerHTML = '<svg class="dial" viewBox="0 0 230 230" role="img" aria-label="Compass"><circle cx="115" cy="115" r="108" fill="#fff" stroke="#16231D" stroke-width="3"/>' +
+    '<g id="gfpRose"><g stroke="#5B6B62" stroke-width="2">' + ticks() + '</g><text x="115" y="46" text-anchor="middle" font-size="20" font-weight="700" fill="#D9480F">N</text>' +
+    '<text x="198" y="122" text-anchor="middle" font-size="16" fill="#16231D">E</text><text x="115" y="206" text-anchor="middle" font-size="16" fill="#16231D">S</text>' +
+    '<text x="32" y="122" text-anchor="middle" font-size="16" fill="#16231D">W</text><circle cx="115" cy="115" r="60" fill="none" stroke="#C5CEC4"/></g>' +
+    '<polygon points="115,2 107,20 123,20" fill="#D9480F"/></svg>';
+  var hd = el('div', {class: 'read'}, '---'), pl = el('div', {class: 'num'}, '---'), ln = el('div', {class: 'num'}, '---'), gp = el('div', {class: 'num'}, 'No GPS fix');
+  var note = el('p', {class: 'warn'}, sensorNote());
+  var card = el('div', {class: 'card'}, [el('h2', {}, 'Compass and clinometer'),
+    el('p', {class: 'hint'}, 'The needle follows the top edge when the phone is flat, and the camera direction when held upright. Set declination in Setup.'),
+    rose, hd, el('div', {class: 'hint', style: 'margin-top:6px'}, 'Plane now (back of phone on the surface): dip direction / dip'), pl,
+    el('div', {class: 'hint', style: 'margin-top:6px'}, 'Line now (long edge along the line): trend / plunge'), ln, note,
+    el('div', {class: 'bar'}, [el('button', {type: 'button', class: 'btn pri', onclick: function () { startSensors().then(function (ok) { if (ok) toast('Sensors on'); }); }}, 'Start compass')])]);
+  var cardG = el('div', {class: 'card'}, [el('h2', {}, 'GPS'), gp,
+    el('div', {class: 'bar'}, [
+      el('button', {type: 'button', class: 'btn dark', onclick: function () { getFix().then(function () { toast('Fix updated'); }).catch(function (e) { toast(e.message, true); }); }}, 'Get fix now'),
+      el('button', {type: 'button', class: 'btn', onclick: toggleWatch}, 'Start or stop tracking')])]);
+  var names = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+  var lis = function (o) {
+    var h = heading(o); hd.textContent = Math.round(h) + ' deg ' + names[Math.round(h / 22.5) % 16];
+    var g = rose.querySelector('#gfpRose'); if (g) g.setAttribute('transform', 'rotate(' + (-h).toFixed(1) + ' 115 115)');
+    var p = measure(o, 'plane'), l = measure(o, 'line');
+    pl.textContent = (p.a === null ? 'flat' : Math.round(p.a)) + ' / ' + Math.round(p.b); ln.textContent = Math.round(l.a) + ' / ' + Math.round(l.b); note.textContent = sensorNote();
+  };
+  var gl = function () { if (S.fix) gp.textContent = S.fix.lat.toFixed(6) + ', ' + S.fix.lon.toFixed(6) + '  elev ' + (S.fix.alt === null || S.fix.alt === undefined ? 'n/a' : Math.round(S.fix.alt) + ' m') + '  +/- ' + Math.round(S.fix.acc) + ' m'; };
+  Sens.listeners.push(lis); S.tabCleanup = function () { var i = Sens.listeners.indexOf(lis); if (i > -1) Sens.listeners.splice(i, 1); clearInterval(S.gpsTimer); };
+  S.gpsTimer = setInterval(gl, 1000); gl(); if (Sens.last) lis(Sens.last);
+  pane.appendChild(card); pane.appendChild(cardG); return pane;
+}
+
+/* ---------- log: the station flow ---------- */
+function isActive(step) {
+  var s = stationRec(flow().stn), pr = s && s.present; if (!pr || !pr.length) return true;
+  var nm = PRESENT[step]; if (!nm) return true;
+  if (catItems('present').every(function (it) { return it.n !== nm; })) return true;
+  return pr.indexOf(nm) > -1;
+}
+function nextActive(idx) { for (var j = idx + 1; j < STEPS.length; j++) if (isActive(STEPS[j])) return j; return -1; }
+function stepCount(step, stn) { var n = 0; STEPINFO[step].secs.forEach(function (sec) { n += recs(sec).filter(function (r) { return r.stn === stn; }).length; }); return n; }
+function openStationSwitcher() {
+  var f = flow(), modal;
+  var stns = recs('S0').slice().sort(function (a, b) { return stnNum(b.stn) - stnNum(a.stn); });
+  var close = function () { if (modal.parentNode) modal.parentNode.removeChild(modal); };
+  var rows = stns.map(function (r) {
+    return el('button', {type: 'button', class: 'prow', onclick: function () { f.stn = r.stn; f.step = 1; f.sec = 0; S.editEntry = null; saveSettings(); close(); updateStatus(); showTab('log'); }},
+      [el('span', {class: 'tick'}, r.stn === f.stn ? '\u2713' : ''), el('span', {class: 'pn'}, r.stn + (r.location ? '  ' + r.location : '')), el('span', {class: 'pc'}, r.rock || '')]);
+  });
+  modal = el('div', {class: 'modal'}, el('div', {class: 'sheet tall'}, [el('div', {class: 'sh-head'}, [el('h2', {}, 'Choose a station'), el('button', {type: 'button', class: 'btn sm', onclick: close}, 'Close')]),
+    el('button', {type: 'button', class: 'btn pri', style: 'width:100%;margin-bottom:8px', onclick: function () { f.stn = nextStn(); f.step = 0; f.sec = 0; S.editEntry = null; saveSettings(); close(); updateStatus(); showTab('log'); }}, 'New station ' + nextStn()),
+    el('div', {class: 'plist'}, rows.length ? rows : el('p', {class: 'hint'}, 'No saved stations yet.'))]));
+  document.body.appendChild(modal);
+}
+function entryRows(sid, stn, onEdit) {
+  var mine = recs(sid).filter(function (r) { return r.stn === stn; }).sort(function (a, b) { return String(a.created).localeCompare(String(b.created)); });
+  if (!mine.length) return null;
+  return el('div', {class: 'entries'}, mine.map(function (r, i) {
+    return el('div', {class: 'erow'}, [el('div', {class: 'em'}, [el('div', {class: 'ec'}, (r.code ? r.code + '  ' : '') + '#' + (i + 1)), el('div', {class: 'et'}, r.caption || '')]),
+      el('div', {class: 'ea'}, [el('button', {type: 'button', class: 'clr', onclick: function () { onEdit(r); }}, 'Edit'),
+        el('button', {type: 'button', class: 'clr bad', onclick: function () {
+          if (!confirm('Delete this entry and its sample list?')) return;
+          dbDel('records', r.id).then(function () { S.records = S.records.filter(function (x) { return x.id !== r.id; }); updateStatus(); showTab(S.tab); });
+        }}, 'Delete')])]);
+  }));
+}
+function viewLog() {
+  var pane = el('div', {class: 'pane'});
+  if (!proj()) {
+    pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, 'Start with a project'), el('p', {class: 'hint'}, 'Every tab works inside one project. Create it once in Setup, for example Project_Nepal.'),
+      el('div', {class: 'bar'}, [el('button', {type: 'button', class: 'btn pri', onclick: function () { showTab('setup'); }}, 'Go to Setup')])]));
+    return pane;
+  }
+  if (S.extra) {
+    var xs = S.extra, form = makeForm(xs, null, {});
+    pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, SHEETS[xs].title), el('p', {class: 'hint'}, SHEETS[xs].sub), form.node,
+      el('div', {class: 'bar'}, [el('button', {type: 'button', class: 'btn pri', onclick: function () { form.save().then(function (r) { if (r) { toast('Saved'); S.extra = null; showTab('log'); } }); }}, 'Save'),
+        el('button', {type: 'button', class: 'btn', onclick: function () { S.extra = null; showTab('log'); }}, 'Back to station flow')])]));
+    return pane;
+  }
+  var f = flow(), saved = stationSaved(f.stn), idx = clamp(f.step, 0, STEPS.length - 1), step = STEPS[idx];
+  if (!saved && idx > 0) { idx = 0; f.step = 0; step = 'S0'; }
+  pane.appendChild(el('div', {class: 'stationbar'}, [
+    el('div', {}, [el('div', {class: 'hint', style: 'margin:0'}, proj()), el('div', {class: 'bigcode'}, f.stn)]),
+    el('div', {class: 'bar', style: 'margin:0;flex:0 0 auto'}, [
+      el('button', {type: 'button', class: 'btn sm', onclick: openStationSwitcher}, 'Station'),
+      el('button', {type: 'button', class: 'btn sm', onclick: function () { S.extra = 'DL'; showTab('log'); }}, 'Day log'),
+      el('button', {type: 'button', class: 'btn sm', onclick: function () { S.extra = 'KQ'; showTab('log'); }}, 'Questions')])]));
+  var stepper = el('div', {class: 'stepper'});
+  STEPS.forEach(function (k, i) {
+    var n = saved || k === 'S0' ? stepCount(k, f.stn) : 0, dis = !saved && i > 0, dim = saved && i > 0 && !isActive(k);
+    stepper.appendChild(el('button', {type: 'button', class: 'step' + (i === idx ? ' on' : '') + (n ? ' done' : '') + (dim ? ' dim' : ''), disabled: dis ? 'disabled' : null,
+      onclick: function () { f.step = i; f.sec = 0; S.editEntry = null; saveSettings(); showTab('log'); }},
+      [el('span', {class: 'sn'}, String(i + 1)), STEPINFO[k].short, n ? el('i', {}, n) : null]));
+  });
+  pane.appendChild(stepper);
+  var info = STEPINFO[step];
+  var go = function (to) { f.step = to; f.sec = 0; S.editEntry = null; saveSettings(); updateStatus(); showTab('log'); };
+  var finish = function () { var old = f.stn; f.stn = nextStn(); f.step = 0; f.sec = 0; S.editEntry = null; saveSettings(); updateStatus(); toast('Station ' + old + ' complete. Next: ' + f.stn); showTab('log'); };
+  if (step === 'S0') {
+    var existing = stationRec(f.stn), form0 = makeForm('S0', existing, {stn: f.stn});
+    var bar0 = el('div', {class: 'bar sticky'}, [el('button', {type: 'button', class: 'btn pri', onclick: function () {
+      form0.save().then(function (r) { if (!r) return; toast('Saved ' + r.stn); var nx = nextActive(0); if (nx < 0) finish(); else go(nx); });
+    }}, 'Save station and continue')]);
+    pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, '1. Station'), el('p', {class: 'hint'}, 'Position and basic description. Tick what is present: only those steps stay active afterwards.'), form0.node, bar0]));
+    return pane;
+  }
+  var secs = info.secs, si = clamp(f.sec || 0, 0, secs.length - 1), sid = secs[si], spec = SPEC[sid];
+  if (secs.length > 1) {
+    pane.appendChild(el('div', {class: 'seg'}, secs.map(function (sd, i) {
+      var n = recs(sd).filter(function (r) { return r.stn === f.stn; }).length;
+      return el('button', {type: 'button', class: i === si ? 'on' : '', onclick: function () { f.sec = i; S.editEntry = null; showTab('log'); }}, [SPEC[sd].title, n ? el('i', {}, n) : null]);
+    })));
+  }
+  if (!isActive(step)) pane.appendChild(el('div', {class: 'dimnote'}, 'Not marked as present at this station. You can still add data here.'));
+  var list = entryRows(sid, f.stn, function (r) { S.editEntry = r; showTab('log'); });
+  if (list) { pane.appendChild(el('h3', {class: 'sech lone'}, 'Saved at ' + f.stn)); pane.appendChild(list); }
+  var editing = S.editEntry && S.editEntry.sheet === sid ? S.editEntry : null;
+  var ed = entryEditor(sid, editing, f.stn);
+  var bar = el('div', {class: 'bar sticky'});
+  var nx = nextActive(idx);
+  if (editing) {
+    bar.appendChild(el('button', {type: 'button', class: 'btn pri', onclick: function () { ed.save().then(function (r) { if (r) { S.editEntry = null; toast('Changes saved'); showTab('log'); } }); }}, 'Save changes'));
+    bar.appendChild(el('button', {type: 'button', class: 'btn', onclick: function () { S.editEntry = null; showTab('log'); }}, 'Cancel'));
+  } else {
+    bar.appendChild(el('button', {type: 'button', class: 'btn', onclick: function () {
+      if (!ed.hasContent()) { toast('Nothing to save yet.', true); return; }
+      ed.save().then(function (r) { if (r) { toast('Saved. Add another.'); showTab('log'); } });
+    }}, 'Save and add another'));
+    bar.appendChild(el('button', {type: 'button', class: 'btn pri', onclick: function () {
+      var done = function () { if (nx < 0) finish(); else go(nx); };
+      if (ed.hasContent()) ed.save().then(function (r) { if (r) done(); }); else done();
+    }}, nx < 0 ? 'Save and finish station' : 'Save and go to next step'));
+  }
+  pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, (idx + 1) + '. ' + spec.title + (editing ? ' (editing)' : '')), el('p', {class: 'hint'}, spec.sub), ed.node, bar]));
+  return pane;
+}
+
+/* ---------- records ---------- */
+function colDefs(sheet) {
+  var sc = SHEETS[sheet], c = [{key: 'project', label: 'Project'}];
+  if (!sc.nostn) c.push({key: 'stn', label: 'Station'});
+  sc.fields.forEach(function (f) {
+    if (f.type === 'gps') f.keys.forEach(function (k, i) { c.push({key: k, label: ['Latitude', 'Longitude', 'Elevation (m)', 'Accuracy (m)'][i]}); });
+    else if (f.k !== 'stn') c.push({key: f.k, label: f.label});
+  });
+  c.push({key: 'created', label: 'Created'}, {key: 'updated', label: 'Updated'}, {key: 'geologist', label: 'Geologist'});
+  return c;
+}
+function titleOf(sheet) { return SPEC[sheet] ? SPEC[sheet].title : SHEETS[sheet].title; }
+function detailPairs(r) {
+  var out = [], cols = SPEC[r.sheet] ? specCols(SPEC[r.sheet]) : colDefs(r.sheet).filter(function (c) { return ['project', 'created', 'updated', 'geologist', 'stn'].indexOf(c.key) < 0; });
+  if (SPEC[r.sheet]) {
+    if (r.caption) out.push(['Caption', r.caption]);
+    if ((r.photos || []).length) out.push(['Photos', r.photos.map(function (p) { return p.name; }).join(', ')]);
+    if ((r.samples || []).length) out.push(['Samples', r.samples.map(function (s) { return s.code; }).join(', ')]);
+  }
+  cols.forEach(function (c) { var v = Array.isArray(r[c.key]) ? r[c.key].join(', ') : r[c.key]; if (hasVal(v) && c.key !== 'code') out.push([c.label, String(v)]); });
+  return out;
+}
+function viewRecord() {
+  var pane = el('div', {class: 'pane'});
+  if (!proj()) { pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, 'No project yet'), el('p', {class: 'hint'}, 'Create a project in Setup first.')])); return pane; }
+  if (S.edit) {
+    var rc = S.edit, isSpec = !!SPEC[rc.sheet], ed = isSpec ? entryEditor(rc.sheet, rc, rc.stn) : makeForm(rc.sheet, rc, {stn: rc.stn});
+    pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, titleOf(rc.sheet) + (rc.stn ? '  ' + rc.stn : '')), el('p', {class: 'hint'}, 'Editing a saved record'), ed.node,
+      el('div', {class: 'bar'}, [el('button', {type: 'button', class: 'btn pri', onclick: function () { ed.save().then(function (r) { if (r) { S.edit = null; toast('Changes saved'); showTab('record'); } }); }}, 'Save changes'),
+        el('button', {type: 'button', class: 'btn', onclick: function () { S.edit = null; showTab('record'); }}, 'Cancel')])]));
+    return pane;
+  }
+  var mine = S.records.filter(function (r) { return r.project === proj(); });
+  var imp = el('input', {type: 'file', accept: 'application/json', style: 'display:none'});
+  imp.onchange = function () {
+    var fl = imp.files[0]; if (!fl) return;
+    fl.text().then(function (t) {
+      var d = JSON.parse(t), have = {}; S.records.forEach(function (r) { have[r.id] = 1; });
+      var add = (d.records || []).filter(function (r) { return r && r.id && r.sheet && (SPEC[r.sheet] || SHEETS[r.sheet]) && !have[r.id]; });
+      return Promise.all(add.map(function (r) { return dbPut('records', r).then(function () { S.records.push(r); }); })).then(function () { toast('Imported ' + add.length + ' records'); showTab('record'); });
+    }).catch(function () { toast('That file is not a valid backup.', true); });
+  };
+  pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, 'Records of ' + proj()),
+    el('p', {class: 'hint'}, mine.length + ' records, ' + projPhotos().length + ' photos, kept only on this phone. Export every evening.'),
+    el('div', {class: 'bar'}, [
+      el('button', {type: 'button', class: 'btn pri', onclick: exportXlsx}, 'Excel file (.xlsx)'),
+      el('button', {type: 'button', class: 'btn dark', onclick: exportZip}, 'Everything with photos (ZIP)'),
+      el('button', {type: 'button', class: 'btn', onclick: function () { download(new Blob([JSON.stringify({exported: nowStr(), project: proj(), records: mine}, null, 1)], {type: 'application/json'}), safeName(proj()) + '_backup_' + today() + '.json'); }}, 'Backup file'),
+      el('button', {type: 'button', class: 'btn', onclick: function () { imp.click(); }}, 'Import backup')]), imp]));
+  var groups = {}, order = [];
+  mine.forEach(function (r) { var g = r.stn || '~Day logs and questions'; if (!groups[g]) { groups[g] = []; order.push(g); } groups[g].push(r); });
+  order.sort(function (a, b) { return a.charAt(0) === '~' ? 1 : b.charAt(0) === '~' ? -1 : stnNum(b) - stnNum(a); });
+  if (!order.length) pane.appendChild(el('p', {class: 'hint'}, 'No records yet. Start a station on the Log tab.'));
+  order.forEach(function (g) {
+    var items = groups[g].slice().sort(function (a, b) { return XLORDER.indexOf(a.sheet) - XLORDER.indexOf(b.sheet) || String(a.created).localeCompare(String(b.created)); });
+    var s0 = items.filter(function (r) { return r.sheet === 'S0'; })[0], body = el('div', {class: 'body'});
+    items.forEach(function (r) {
+      var dl = el('dl'), pairs = detailPairs(r);
+      pairs.forEach(function (p) { dl.appendChild(el('dt', {}, p[0])); dl.appendChild(el('dd', {}, p[1])); });
+      body.appendChild(el('div', {class: 'subrec'}, [el('b', {}, titleOf(r.sheet) + (r.code ? '  ' + r.code : '')), pairs.length ? dl : el('p', {class: 'hint'}, 'No details'),
+        el('div', {class: 'bar'}, [el('button', {type: 'button', class: 'btn sm', onclick: function () { S.edit = r; showTab('record'); }}, 'Edit'),
+          el('button', {type: 'button', class: 'btn sm danger', onclick: function () {
+            if (!confirm('Delete this ' + titleOf(r.sheet) + ' record?')) return;
+            dbDel('records', r.id).then(function () { S.records = S.records.filter(function (x) { return x.id !== r.id; }); showTab('record'); updateStatus(); });
+          }}, 'Delete')])]));
+    });
+    body.setAttribute('hidden', 'hidden');
+    var head = el('button', {type: 'button', class: 'head', 'aria-expanded': 'false'}, [el('b', {}, g.replace('~', '')), el('span', {class: 'hint', style: 'margin:0'}, (s0 && s0.location ? s0.location + '  ' : '') + items.length + ' records')]);
+    head.onclick = function () { var o = body.hasAttribute('hidden'); if (o) body.removeAttribute('hidden'); else body.setAttribute('hidden', 'hidden'); head.setAttribute('aria-expanded', o ? 'true' : 'false'); };
+    pane.appendChild(el('div', {class: 'rec'}, [head, body]));
+  });
+  return pane;
+}
+
+/* ---------- catalog tab ---------- */
+function viewCatalog() {
+  var pane = el('div', {class: 'pane'}), key = S.catKey || 'rock';
+  var keys = Object.keys(CATALOG_META).sort(function (a, b) { return CATALOG_META[a].localeCompare(CATALOG_META[b]); });
+  var groups = {}, gorder = [];
+  keys.forEach(function (k) { var m = CATALOG_META[k], g = m.indexOf(': ') > -1 ? m.split(': ')[0] : 'General'; if (!groups[g]) { groups[g] = []; gorder.push(g); } groups[g].push(k); });
+  gorder.sort(function (a, b) { return a === 'General' ? -1 : b === 'General' ? 1 : a.localeCompare(b); });
+  var sel = el('select', {}, gorder.map(function (g) {
+    return el('optgroup', {label: g}, groups[g].map(function (k) { var m = CATALOG_META[k]; return el('option', {value: k}, (m.indexOf(': ') > -1 ? m.split(': ').slice(1).join(': ') : m) + ' (' + catItems(k).length + ')'); }));
+  }));
+  sel.value = key; sel.onchange = function () { S.catKey = sel.value; showTab('catalog'); };
+  var items = catItems(key), list = el('div', {class: 'clist'});
+  if (!items.length) list.appendChild(el('p', {class: 'hint'}, 'This list is empty. Add your first item below.'));
+  items.forEach(function (it, i) {
+    list.appendChild(el('div', {class: 'crow'}, [
+      el('div', {class: 'cn'}, [el('b', {}, it.n), it.c ? el('span', {class: 'pc'}, it.c) : null, it.u ? el('span', {class: 'mine'}, 'yours') : null]),
+      el('div', {class: 'cb'}, [
+        el('button', {type: 'button', class: 'btn sm', 'aria-label': 'Move up', disabled: i === 0 ? 'disabled' : null, onclick: function () { items.splice(i - 1, 0, items.splice(i, 1)[0]); saveCatalog(); showTab('catalog'); }}, '\u2191'),
+        el('button', {type: 'button', class: 'btn sm', 'aria-label': 'Move down', disabled: i === items.length - 1 ? 'disabled' : null, onclick: function () { items.splice(i + 1, 0, items.splice(i, 1)[0]); saveCatalog(); showTab('catalog'); }}, '\u2193'),
+        el('button', {type: 'button', class: 'btn sm', onclick: function () {
+          ask('Edit item', 'Full name', it.n, 'Next').then(function (n) { if (!n) return; return ask('Edit item', 'Short code for searching (optional)', it.c, 'Save').then(function (c) { it.n = n; it.c = c || ''; saveCatalog(); showTab('catalog'); }); });
+        }}, 'Edit'),
+        el('button', {type: 'button', class: 'btn sm danger', onclick: function () { if (confirm('Remove \u201c' + it.n + '\u201d from this list? Saved records keep their text.')) { items.splice(i, 1); saveCatalog(); showTab('catalog'); } }}, 'Remove')])]));
+  });
+  var nIn = el('input', {type: 'text', placeholder: 'Full name, for example Chlorite schist', autocomplete: 'off'}), cIn = el('input', {type: 'text', placeholder: 'Short code (optional), for example Chl', autocomplete: 'off'});
+  pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, 'Catalog'),
+    el('p', {class: 'hint'}, 'Every list used in the forms lives here. Items always show in full words. The short code only helps you find an item when you type in the search box. Anything you add is listed from then on.'),
+    el('div', {class: 'f'}, [el('label', {}, 'List'), sel]), list,
+    el('div', {class: 'tool'}, [el('div', {class: 'lbl'}, 'Add your own item'), nIn, el('div', {style: 'height:6px'}), cIn, el('div', {class: 'bar'}, [
+      el('button', {type: 'button', class: 'btn pri', onclick: function () {
+        if (!nIn.value.trim()) { toast('Type the full name first.', true); return; }
+        addCatalogItem(key, nIn.value, cIn.value); toast('Added'); showTab('catalog');
+      }}, 'Add to this list')])]),
+    el('div', {class: 'bar'}, [
+      el('button', {type: 'button', class: 'btn', onclick: function () { if (confirm('Restore the original items of this list? Your own items will be removed.')) { S.catalog[key] = DEFAULTS[key].map(function (x) { return {n: x.n, c: x.c}; }); saveCatalog(); showTab('catalog'); } }}, 'Restore this list'),
+      el('button', {type: 'button', class: 'btn', onclick: function () { download(new Blob([JSON.stringify(S.catalog, null, 1)], {type: 'application/json'}), 'catalog_' + today() + '.json'); }}, 'Export all lists')])]));
+  return pane;
+}
+
+/* ---------- setup ---------- */
+function viewSetup() {
+  var pane = el('div', {class: 'pane'}), st = S.settings;
+  var sel = el('select', {}, [el('option', {value: ''}, st.projects.length ? 'Choose a project' : 'No project yet')].concat(st.projects.map(function (p) { return el('option', {value: p}, p); })));
+  sel.value = st.project || '';
+  sel.onchange = function () { st.project = sel.value; saveSettings(); updateStatus(); toast(sel.value ? 'Project: ' + sel.value : 'No project'); showTab('setup'); };
+  var nIn = el('input', {type: 'text', placeholder: 'For example Project_Nepal', autocomplete: 'off'});
+  pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, 'Project'),
+    el('p', {class: 'hint'}, 'All tabs work inside the chosen project. Station codes (St_01, St_02) and sample and photo codes are made for it automatically.'),
+    el('div', {class: 'f'}, [el('label', {}, 'Current project'), sel]),
+    el('div', {class: 'f'}, [el('label', {}, 'Create a new project'), nIn]),
+    el('div', {class: 'bar'}, [el('button', {type: 'button', class: 'btn pri', onclick: function () {
+      var n = nIn.value.trim().replace(/\s+/g, '_'); if (!n) { toast('Type a project name.', true); return; }
+      if (st.projects.indexOf(n) > -1) { toast('That project already exists.', true); return; }
+      st.projects.push(n); st.project = n; saveSettings(); updateStatus(); toast('Project ready: ' + n); showTab('log');
+    }}, 'Create project and start')])]));
+  var g = el('input', {type: 'text', value: st.geologist || '', autocomplete: 'name'}), dc = el('input', {type: 'number', step: '0.1', inputmode: 'decimal', value: st.decl});
+  var sp = listControl('Photo stamp', 'yesno', false, st.stamp ? 'Yes' : 'No');
+  pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, 'You and your phone'),
+    el('div', {class: 'f'}, [el('label', {}, 'Geologist'), g]),
+    el('div', {class: 'f'}, [el('label', {}, 'Magnetic declination (degrees east, west is negative)'), dc, el('p', {class: 'hint', style: 'margin:3px 0 0'}, 'Added to every compass reading. Use 0 to stay on magnetic north, as on a standard Brunton.')]),
+    el('div', {class: 'f'}, [el('label', {}, 'Stamp photos with code, time, position and facing'), sp.node]),
+    el('div', {class: 'bar'}, [el('button', {type: 'button', class: 'btn pri', onclick: function () {
+      st.geologist = g.value.trim(); st.decl = Number(dc.value) || 0; st.stamp = sp.get() !== 'No'; saveSettings(); updateStatus(); toast('Settings saved');
+    }}, 'Save settings')])]));
+  pane.appendChild(el('details', {class: 'card'}, [el('summary', {style: 'font-weight:700;font-size:16px'}, 'iPhone tips'),
+    el('ol', {class: 'hint', style: 'padding-left:18px;margin-top:8px'}, [
+      el('li', {}, 'Use Safari to install: Share, then Add to Home Screen. It then opens full screen like an app and keeps its data.'),
+      el('li', {}, 'Allow Location (turn on Precise Location), Camera, and Motion and Orientation when asked. Tap Start compass to give motion access.'),
+      el('li', {}, 'Compass: hold the phone flat for two seconds after starting, so the iPhone can fix north.'),
+      el('li', {}, 'Chrome on iPhone works too; use it if you need your Google Drive. Chrome and Safari keep separate data, so use one of them for fieldwork.'),
+      el('li', {}, 'Export every evening and copy the ZIP to a laptop. Browsers can clear stored data if the phone is short of space.')])]));
+  pane.appendChild(el('div', {class: 'card'}, [el('h2', {}, 'This device'),
+    el('p', {class: 'hint'}, (window.isSecureContext ? 'Secure page: yes. ' : 'Secure page: NO. GPS, compass and camera need HTTPS. ') + ('geolocation' in navigator ? 'GPS: available. ' : 'GPS: missing. ') +
+      (typeof DeviceOrientationEvent !== 'undefined' ? 'Motion sensors: available. ' : 'Motion sensors: missing. ') + (navigator.mediaDevices ? 'Camera: available. ' : 'Camera: missing. ') + ('serviceWorker' in navigator ? 'Offline mode: available.' : 'Offline mode: missing.')),
+    el('div', {class: 'bar'}, [
+      el('button', {type: 'button', class: 'btn', onclick: function () { if (navigator.storage && navigator.storage.persist) navigator.storage.persist().then(function (ok) { toast(ok ? 'Storage protected from automatic cleanup' : 'The browser did not grant protected storage', !ok); }); }}, 'Protect stored data'),
+      el('button', {type: 'button', class: 'btn danger', onclick: function () {
+        if (!proj()) return;
+        if (!confirm('Delete all records and photos of ' + proj() + ' from this phone? Export first.')) return;
+        var p = proj(), rs = S.records.filter(function (r) { return r.project === p; }), ps = S.photos.filter(function (x) { return x.project === p; });
+        Promise.all(rs.map(function (r) { return dbDel('records', r.id); }).concat(ps.map(function (x) { return dbDel('photos', x.id); }))).then(function () {
+          S.records = S.records.filter(function (r) { return r.project !== p; }); S.photos = S.photos.filter(function (x) { return x.project !== p; }); delete st.flow[p]; saveSettings(); updateStatus(); toast('Project data deleted'); showTab('setup');
+        });
+      }}, 'Delete this project\u2019s data')])]));
+  return pane;
+}
+
+/* ---------- tables for export ---------- */
+function csvCell(v) {
+  if (Array.isArray(v)) v = v.join(' | ');
+  if (v === undefined || v === null) v = '';
+  v = String(v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+}
+function specCols(spec) {
+  var map = {}, order = [];
+  function add(f, tname) {
+    (f.keys ? f.keys.map(function (k, i) { return {key: k, label: f.label + ': ' + f.labels[i]}; }) : [{key: f.k, label: f.label}]).forEach(function (c) {
+      if (!map[c.key]) { map[c.key] = {key: c.key, labels: [], types: []}; order.push(map[c.key]); }
+      var m = map[c.key]; if (m.labels.indexOf(c.label) < 0) m.labels.push(c.label); if (tname && m.types.indexOf(tname) < 0) m.types.push(tname);
+    });
+  }
+  if (spec.typed) {
+    Object.keys(spec.types).forEach(function (t) { var d = spec.types[t]; ['cls', 'meas', 'extra'].forEach(function (g) { (d[g] || []).forEach(function (f) { add(f, t); }); }); });
+    (spec.common || []).forEach(function (f) { add(f, null); });
+  } else spec.fields.forEach(function (f) { add(f, null); });
+  return order.map(function (m) { return {key: m.key, label: (m.types.length === 1 ? m.types[0] + ': ' : '') + m.labels.slice(0, 2).join(' / ')}; });
+}
+function jv(v) { return Array.isArray(v) ? v.join(' | ') : (v === undefined || v === null ? '' : v); }
+function plainTable(id) {
+  var cols = colDefs(id);
+  return {name: SHEETS[id].xl, cols: cols, rows: recs(id).sort(function (a, b) { return stnNum(a.stn) - stnNum(b.stn) || String(a.created).localeCompare(String(b.created)); })
+    .map(function (r) { return cols.map(function (c) { return jv(r[c.key]); }); })};
+}
+function specTable(id) {
+  var spec = SPEC[id], sc = specCols(spec), cols = [{label: 'Station'}, {label: 'Entry number'}];
+  if (spec.code) cols.push({label: spec.code.label});
+  if (spec.typed) cols.push({label: spec.typeLabel});
+  cols.push({label: 'Caption'}, {label: 'Photo codes'}, {label: 'Sample codes'});
+  sc.forEach(function (c) { cols.push({label: c.label}); });
+  cols.push({label: 'Created'}, {label: 'Geologist'});
+  var count = {}, rows = recs(id).sort(function (a, b) { return stnNum(a.stn) - stnNum(b.stn) || String(a.created).localeCompare(String(b.created)); }).map(function (r) {
+    count[r.stn] = (count[r.stn] || 0) + 1;
+    var row = [r.stn, count[r.stn]];
+    if (spec.code) row.push(r.code || '');
+    if (spec.typed) row.push(r[spec.typeKey] || '');
+    row.push(r.caption || '', (r.photos || []).map(function (p) { return p.name; }).join(' | '), (r.samples || []).map(function (s) { return s.code; }).join(' | '));
+    sc.forEach(function (c) { row.push(jv(r[c.key])); });
+    row.push(r.created || '', r.geologist || ''); return row;
+  });
+  var nm = spec.title.replace(/ and .*$/, ''); if (id === 'S1') nm = 'Lithology'; if (id === 'S1E') nm = 'Younging evidence';
+  return {name: nm, cols: cols, rows: rows};
+}
+function samplesTable() {
+  var cols = ['Sample code', 'Station', 'Step', 'Entry code', 'Entry type', 'Sample type', 'Oriented', 'Orientation: dip direction', 'Orientation: dip angle', 'Description', 'Interval (m)', 'Mass (kg)', 'Condition', 'Analyses', 'Notes', 'Caption'].map(function (l) { return {label: l}; });
+  var rows = [];
+  XLORDER.forEach(function (id) {
+    if (!SPEC[id]) return;
+    recs(id).forEach(function (r) { (r.samples || []).forEach(function (s) {
+      rows.push([s.code, r.stn, SPEC[id].title, r.code || '', SPEC[id].typed ? (r[SPEC[id].typeKey] || '') : '', s.type || '', s.oriented || '', jv(s.ori_dd), jv(s.ori_da), s.what || '', jv(s.interval), jv(s.mass), s.condition || '', jv(s.analyses), s.notes || '', s.caption || '']);
+    }); });
+  });
+  return {name: 'Samples', cols: cols, rows: rows};
+}
+function photosTable() {
+  var cols = ['Photo code', 'Station', 'Step', 'Entry', 'Subject', 'Caption', 'Time', 'Latitude', 'Longitude', 'Accuracy (m)', 'Facing (deg)'].map(function (l) { return {label: l}; });
+  return {name: 'Photos', cols: cols, rows: projPhotos().map(function (p) {
+    return [p.name, p.stn, p.tab && SPEC[p.tab] ? SPEC[p.tab].title : 'General photo', p.entryType || '', p.subject, p.caption, p.time, p.lat, p.lon, p.acc, p.heading];
+  })};
+}
+function buildTables() {
+  var out = [];
+  XLORDER.forEach(function (id) { out.push(SPEC[id] ? specTable(id) : plainTable(id)); });
+  out.push(samplesTable(), photosTable());
+  return out.filter(function (t) { return t.rows.length || t.name === 'Station'; });
+}
+function tableCSV(t) { return '\ufeff' + [t.cols.map(function (c) { return csvCell(c.label); }).join(',')].concat(t.rows.map(function (r) { return r.map(csvCell).join(','); })).join('\r\n'); }
+var CRC = (function () { var t = [], n, c, k; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u) { var c = 0xFFFFFFFF; for (var i = 0; i < u.length; i++) c = CRC[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function makeZip(files, mime) {
+  var enc = new TextEncoder(), parts = [], central = [], off = 0, d = new Date();
+  var dt = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)), dd = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate());
+  files.forEach(function (f) {
+    var nm = enc.encode(f.name), crc = crc32(f.data), n = f.data.length;
+    var lh = new Uint8Array(30 + nm.length), v = new DataView(lh.buffer);
+    v.setUint32(0, 0x04034b50, true); v.setUint16(4, 20, true); v.setUint16(6, 0x0800, true); v.setUint16(10, dt, true); v.setUint16(12, dd, true);
+    v.setUint32(14, crc, true); v.setUint32(18, n, true); v.setUint32(22, n, true); v.setUint16(26, nm.length, true); lh.set(nm, 30);
+    var ch = new Uint8Array(46 + nm.length), c = new DataView(ch.buffer);
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(12, dt, true); c.setUint16(14, dd, true);
+    c.setUint32(16, crc, true); c.setUint32(20, n, true); c.setUint32(24, n, true); c.setUint16(28, nm.length, true); c.setUint32(42, off, true); ch.set(nm, 46);
+    parts.push(lh, f.data); central.push(ch); off += lh.length + n;
+  });
+  var cd = central.reduce(function (a, c) { return a + c.length; }, 0), end = new Uint8Array(22), e = new DataView(end.buffer);
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cd, true); e.setUint32(16, off, true);
+  return new Blob(parts.concat(central, [end]), {type: mime || 'application/zip'});
+}
+function colName(i) { var s = ''; i++; while (i > 0) { var m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
+function xe(s) { return String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function sheetXml(cols, rows) {
+  var x = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="' + cols.length + '" width="20" customWidth="1"/></cols><sheetData>';
+  function cell(r, c, v, st) {
+    var ref = colName(c) + r, s = st ? ' s="' + st + '"' : '';
+    if (typeof v === 'number' && isFinite(v)) return '<c r="' + ref + '"' + s + '><v>' + v + '</v></c>';
+    if (v === '' || v === null || v === undefined) return st ? '<c r="' + ref + '"' + s + '/>' : '';
+    return '<c r="' + ref + '" t="inlineStr"' + s + '><is><t xml:space="preserve">' + xe(v) + '</t></is></c>';
+  }
+  x += '<row r="1">' + cols.map(function (c, i) { return cell(1, i, c.label, 1); }).join('') + '</row>';
+  rows.forEach(function (r, ri) { x += '<row r="' + (ri + 2) + '">' + r.map(function (v, i) { return cell(ri + 2, i, v, 0); }).join('') + '</row>'; });
+  return x + '</sheetData></worksheet>';
+}
+function buildXlsx() {
+  var enc = new TextEncoder(), sheets = [], used = {};
+  buildTables().forEach(function (t) { sheets.push({name: t.name, cols: t.cols, rows: t.rows}); });
+  sheets.forEach(function (s) { s.name = s.name.replace(/[\[\]:*?\/\\]/g, '').slice(0, 31); var b = s.name, n = 1; while (used[s.name]) { n++; s.name = b.slice(0, 28) + ' ' + n; } used[s.name] = 1; });
+  var ns = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"', head = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  var files = [
+    {name: '[Content_Types].xml', data: enc.encode(head + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+      sheets.map(function (s, i) { return '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>'; }).join('') + '</Types>')},
+    {name: '_rels/.rels', data: enc.encode(head + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>')},
+    {name: 'xl/workbook.xml', data: enc.encode(head + '<workbook ' + ns + ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' +
+      sheets.map(function (s, i) { return '<sheet name="' + xe(s.name) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>'; }).join('') + '</sheets></workbook>')},
+    {name: 'xl/_rels/workbook.xml.rels', data: enc.encode(head + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      sheets.map(function (s, i) { return '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>'; }).join('') +
+      '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>')},
+    {name: 'xl/styles.xml', data: enc.encode(head + '<styleSheet ' + ns + '><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFDDE3DA"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>')}
+  ];
+  sheets.forEach(function (s, i) { files.push({name: 'xl/worksheets/sheet' + (i + 1) + '.xml', data: enc.encode(sheetXml(s.cols, s.rows))}); });
+  return makeZip(files, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+}
+function exportXlsx() {
+  if (!S.records.some(function (r) { return r.project === proj(); })) { toast('Nothing to export yet.', true); return; }
+  download(buildXlsx(), safeName(proj()) + '_' + today() + '.xlsx'); toast('Excel file saved');
+}
+function exportZip() {
+  var enc = new TextEncoder(), files = [], base = safeName(proj());
+  files.push({name: base + '.xlsx', data: null});
+  buildTables().forEach(function (t) { files.push({name: 'csv/' + t.name.replace(/[^A-Za-z0-9]+/g, '_') + '.csv', data: enc.encode(tableCSV(t))}); });
+  files.push({name: 'backup.json', data: enc.encode(JSON.stringify({exported: nowStr(), project: proj(), records: S.records.filter(function (r) { return r.project === proj(); })}, null, 1))});
+  return buildXlsx().arrayBuffer().then(function (b) {
+    files[0].data = new Uint8Array(b);
+    return Promise.all(projPhotos().map(function (p) { return p.blob.arrayBuffer().then(function (bb) { files.push({name: 'photos/' + p.name + '.jpg', data: new Uint8Array(bb)}); }); }));
+  }).then(function () { download(makeZip(files), base + '_' + today() + '.zip'); toast('ZIP saved'); });
+}
+
+/* ---------- shell: header, status, bottom menu ---------- */
+var elHdr, elMain, elNav, chipProj, chipGps, chipNet, chipStn;
+var ICONS = {
+  setup: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>',
+  log: '<svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>',
+  compass: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
+  photo: '<svg viewBox="0 0 24 24"><path d="M4 8h3l2-2h6l2 2h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  record: '<svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M4 10h16M4 15h16M10 5v14"/></svg>',
+  catalog: '<svg viewBox="0 0 24 24"><path d="M5 5h14M5 10h14M5 15h14M5 20h9"/><path d="M17 17l3 3M20 17l-3 3"/></svg>'
+};
+var TABS = [['setup', 'Setup'], ['log', 'Log'], ['compass', 'Compass'], ['photo', 'Photo'], ['record', 'Record'], ['catalog', 'Catalog']];
+function updateStatus() {
+  if (!elHdr) return;
+  var f = S.fix, cls = !f ? '' : f.acc <= 15 ? 'ok' : f.acc <= 50 ? 'warn' : 'bad';
+  chipProj.textContent = proj() || 'No project';
+  chipStn.textContent = proj() ? flow().stn : '';
+  chipStn.style.display = proj() ? '' : 'none';
+  chipGps.innerHTML = ''; chipGps.appendChild(el('span', {class: 'dot ' + cls})); chipGps.appendChild(document.createTextNode(f ? '\u00b1' + Math.round(f.acc) + ' m' : 'GPS'));
+  if (S.watch !== null) chipGps.appendChild(el('span', {class: 'live'}, 'on'));
+  chipNet.className = 'dot ' + (navigator.onLine ? 'ok' : 'warn'); chipNet.title = navigator.onLine ? 'Online' : 'Offline, data kept on phone';
+}
+function showTab(name) {
+  if (S.tabCleanup) { S.tabCleanup(); S.tabCleanup = null; }
+  S.tab = name;
+  [].forEach.call(elNav.children, function (b) { b.setAttribute('aria-selected', b.getAttribute('data-t') === name ? 'true' : 'false'); });
+  elMain.innerHTML = '';
+  elMain.appendChild({setup: viewSetup, log: viewLog, compass: viewCompass, photo: viewPhoto, record: viewRecord, catalog: viewCatalog}[name]());
+  elMain.scrollTop = 0; updateStatus();
+}
+function build() {
+  root.innerHTML = '';
+  chipProj = el('div', {class: 'proj'}); chipStn = el('button', {type: 'button', class: 'stn', onclick: function () { showTab('log'); openStationSwitcher(); }});
+  chipGps = el('button', {type: 'button', class: 'gps', onclick: toggleWatch, 'aria-label': 'GPS status, tap to start or stop tracking'});
+  chipNet = el('span', {class: 'dot'});
+  elHdr = el('header', {class: 'hdr'}, [el('div', {class: 'hl'}, [el('div', {class: 'lab'}, 'Project'), chipProj]), chipStn, el('div', {class: 'hr'}, [chipGps, chipNet])]);
+  elMain = el('main', {class: 'main'});
+  elNav = el('nav', {class: 'tabbar', role: 'tablist'}, TABS.map(function (t) {
+    var b = el('button', {type: 'button', role: 'tab', 'data-t': t[0], onclick: function () { if (t[0] !== 'log') { S.extra = null; S.editEntry = null; } if (t[0] !== 'record') S.edit = null; showTab(t[0]); }}, [el('span', {class: 'ic'}), t[1]]);
+    b.firstChild.innerHTML = ICONS[t[0]]; return b;
+  }));
+  [elHdr, elMain, elNav].forEach(function (n) { root.appendChild(n); });
+  updateStatus();
+}
+
+/* ---------- start ---------- */
+build();
+window.addEventListener('online', updateStatus); window.addEventListener('offline', updateStatus);
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) { navigator.serviceWorker.register('sw.js').catch(function () {}); }
+openDB().then(function (d) { db = d; return Promise.all([dbAll('records'), dbAll('photos')]); }).then(function (r) {
+  S.records = r[0]; S.photos = r[1].sort(function (a, b) { return String(a.time).localeCompare(String(b.time)); });
+  if (S.settings.project && S.settings.projects.indexOf(S.settings.project) < 0) S.settings.projects.push(S.settings.project);
+  showTab(proj() ? 'log' : 'setup');
+}).catch(function () {
+  elMain.appendChild(el('div', {class: 'pane'}, el('div', {class: 'card'}, [el('h2', {}, 'Storage is blocked'),
+    el('p', {}, 'This browser is not allowing local storage (private browsing or strict settings). Open the page in a normal tab.')])));
+});
+})();
+</script>
+</body>
+</html>

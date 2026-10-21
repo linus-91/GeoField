@@ -1,0 +1,15 @@
+{
+  "name": "Field data portal",
+  "short_name": "Field",
+  "description": "Offline field data entry for geological fieldwork",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#16231D",
+  "theme_color": "#16231D",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
